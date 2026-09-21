@@ -4326,6 +4326,32 @@ export type Database = {
       }
       text_soundex: { Args: { "": string }; Returns: string }
       unaccent: { Args: { "": string }; Returns: string }
+      wiki_save_entry: {
+        Args: { p_base?: Json; p_fields: Json; p_id: string }
+        Returns: string
+      }
+      wiki_search_entries: {
+        Args: {
+          p_before_id?: string
+          p_before_time?: string
+          p_category?: string
+          p_limit?: number
+          p_link_title?: string
+          p_search?: string
+          p_status?: string
+          p_tag?: string
+        }
+        Returns: {
+          category: string
+          created_at: string
+          id: string
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
