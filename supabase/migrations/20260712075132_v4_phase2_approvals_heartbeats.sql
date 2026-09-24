@@ -108,3 +108,13 @@ create policy agent_heartbeats_update_own on public.agent_heartbeats
 
 -- 4. Realtime：App 前台 postgres_changes 订阅 approval_requests（agent_events 已在 Phase 1 登记）
 alter publication supabase_realtime add table public.approval_requests;
+
+-- 5. Data API 授权（Supabase 2026-10-30 起新表不再自动授权，建表的迁移必须自带 GRANT）
+-- approval_requests 客户端只读（响应走 respond_to_approval，security definer 不依赖调用方表权限）；
+-- agent_heartbeats 客户端可上报自身心跳（无 DELETE）。
+revoke all on table public.approval_requests from anon;
+revoke all on table public.agent_heartbeats from anon;
+grant select on table public.approval_requests to authenticated;
+grant select, insert, update on table public.agent_heartbeats to authenticated;
+grant select, insert, update, delete on table public.approval_requests to service_role;
+grant select, insert, update, delete on table public.agent_heartbeats to service_role;

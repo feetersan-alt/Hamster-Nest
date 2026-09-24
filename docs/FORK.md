@@ -15,6 +15,8 @@ Dashboard → Authentication → Users → Add user，用邮箱+密码创建你�
 用编辑器打开仓库里的 `supabase/schema.sql`，做两个全局替换：`11111111-1111-1111-1111-111111111111` → 你的 user UUID；`YOUR_PROJECT_REF` → 你的项目 ref。
 把替换后的整个文件粘贴进 SQL Editor 运行一次（约 440KB，可整体粘贴；文件幂等，报错修复后可整体重跑）。
 
+> **Supabase 2026-10-30 起的新规**：`public` 里新建的表不再自动获得 Data API（PostgREST / supabase-js）权限，缺 GRANT 的表会报 `permission denied`。`schema.sql` 与 `supabase/migrations/` 里每张表都已自带 `GRANT ... TO authenticated / service_role`，照常跑即可；你自己以后加表时，请把 GRANT 写进建表的同一份 SQL（`npm test` 里的 `migration-grants` 会检查迁移目录）。
+
 ## 4. 开启 Auth 邮箱登录
 
 Dashboard → Authentication → Sign In / Up → 确认 Email 登录已启用；单人使用建议顺手关掉「Allow new users to sign up」，防止陌生人注册。

@@ -29,3 +29,7 @@ create policy if not exists "Users can update own rp npc cards"
 create policy if not exists "Users can delete own rp npc cards"
   on public.rp_npc_cards for delete
   using (auth.uid() = user_id);
+
+-- Data API 授权（Supabase 2026-10-30 起新表不再自动授权，建表的迁移必须自带 GRANT）
+revoke all on table public.rp_npc_cards from anon;
+grant select, insert, update, delete on table public.rp_npc_cards to authenticated, service_role;

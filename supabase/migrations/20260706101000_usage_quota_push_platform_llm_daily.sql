@@ -19,6 +19,12 @@ create policy "usage_quota_select_authenticated" on public.usage_quota
   for select to authenticated
   using (user_id = (select auth.uid()));
 
+-- Data API 授权（Supabase 2026-10-30 起新表不再自动授权，建表的迁移必须自带 GRANT）：
+-- 客户端只读；写入只经下面的 security definer 函数，authenticated 不需要 INSERT/UPDATE。
+revoke all on table public.usage_quota from anon;
+grant select on table public.usage_quota to authenticated;
+grant select, insert, update, delete on table public.usage_quota to service_role;
+
 -- Atomically bump today's counter and return the new count. Limits live in
 -- the calling function so per-scope tuning is a code change, not a DDL one.
 create or replace function public.consume_usage_quota(p_user_id uuid, p_scope text)

@@ -46,3 +46,9 @@ create policy "Users can manage session-group links for their own groups"
         and rp_story_groups.user_id = auth.uid()
     )
   );
+
+-- Data API 授权（Supabase 2026-10-30 起新表不再自动授权，建表的迁移必须自带 GRANT）
+revoke all on table public.rp_story_groups from anon;
+revoke all on table public.rp_session_groups from anon;
+grant select, insert, update, delete on table public.rp_story_groups to authenticated, service_role;
+grant select, insert, update, delete on table public.rp_session_groups to authenticated, service_role;

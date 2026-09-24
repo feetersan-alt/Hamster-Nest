@@ -34,9 +34,12 @@ create policy council_categories_update on public.council_categories
   with check ((select auth.uid()) is not null);
 
 -- 列级权限收紧：改名只能动 label，key / sort_order 客户端不可写
+-- （Supabase 2026-10-30 起新表不再自动授权，SELECT 与 service_role 的权限也必须在这里显式给出）
 revoke all on table public.council_categories from anon;
 revoke insert, update, delete on table public.council_categories from authenticated;
+grant select on table public.council_categories to authenticated;
 grant update (label) on public.council_categories to authenticated;
+grant select, insert, update, delete on table public.council_categories to service_role;
 
 -- category 列注释同步新语义（原「分类演进免 migration」表述由固定槽位+改名取代）
 comment on column public.agent_council.category is

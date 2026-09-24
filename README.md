@@ -552,6 +552,8 @@ npm run db:types:check     # 检查 committed types 是否与生产 schema 一�
 
 Supabase CLI 固定为 `2.109.1`，类型源固定为项目 `crfhiumxzmaszkapanrb`。`src/supabase/database.types.ts` 是 generated 文件，禁止手改。数据库 migration 必须与本仓和 Expo App 的类型更新同批提交，并在 PR 中记录 migration / schema commit；生成和漂移检查均需通过环境变量提供 `SUPABASE_ACCESS_TOKEN`，脚本不会读取 macOS Keychain。
 
+加表守则（Supabase 2026-10-30 起 `public` 新表不再自动授予 Data API 权限）：`create table public.x` 与它的 `grant ... on table public.x to authenticated, service_role`（并 `revoke all ... from anon`）必须写在同一份 migration 里，`authenticated` 给到的动作与该表的 RLS 策略面一致；`tests/migration-grants.test.mjs` 会在 `npm test` 时检查迁移目录。
+
 **② 前端部署（GitHub Pages）**
 
 推送到 `main` 分支时，`deploy-pages.yml` 自动构建并发布到 GitHub Pages。

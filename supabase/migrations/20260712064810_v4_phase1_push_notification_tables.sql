@@ -96,3 +96,15 @@ create policy notification_events_select_own on public.notification_events
 
 -- 4. Realtime：App 前台 postgres_changes 订阅 agent_events（approval_requests 随 Phase 2 加入）
 alter publication supabase_realtime add table public.agent_events;
+
+-- 5. Data API 授权（Supabase 2026-10-30 起新表不再自动授权，建表的迁移必须自带 GRANT）
+-- 表级权限与上面的策略面一致：device_tokens 全开；agent_events 只追加；notification_events 客户端只读。
+revoke all on table public.device_tokens from anon;
+revoke all on table public.agent_events from anon;
+revoke all on table public.notification_events from anon;
+grant select, insert, update, delete on table public.device_tokens to authenticated;
+grant select, insert on table public.agent_events to authenticated;
+grant select on table public.notification_events to authenticated;
+grant select, insert, update, delete on table public.device_tokens to service_role;
+grant select, insert, update, delete on table public.agent_events to service_role;
+grant select, insert, update, delete on table public.notification_events to service_role;
