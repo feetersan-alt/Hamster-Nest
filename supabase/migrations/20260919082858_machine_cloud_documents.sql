@@ -1,4 +1,15 @@
--- T55: owner-scoped cloud documents. Existing append-only publishing/locking/RLS applies.
+-- 仓鼠机文档迁云（2026-09-19，T55）
+--
+-- 背景：Mac mini 上的 CLI 文档与固定任务配置从本地文件迁到云端，复用 prompt_templates 与既有的
+-- owner 发布 / RLS / append-only 版本历史，不新建表；本轮不改公有表字段，也不动 Edge Functions。
+-- 内容：seed 29 项文档与任务配置（machine_doc_* / machine_job_*）。
+-- 约束：私有触发器 validate_machine_document 限制单篇文档 1..64KB；固定任务（machine_job_*）
+--       只允许改 title / taskContent，排班字段（hour / minute / daysOfWeek / targetRole 等）锁死。
+-- 读写：App 端管理（发布新版本），Mini 端按版本读取。
+-- 验证：supabase/tests/machine_cloud_documents.sql（事务内回滚），覆盖版本发布 / 冲突 /
+--       排班锁定 / 恢复 / 历史 / 跨 owner 读取。
+-- 后续：20260919091245_consolidate_machine_documents.sql 做重复 / 退役项的收口。
+
 CREATE OR REPLACE FUNCTION private.validate_machine_document()
 RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $fn$
 DECLARE spec jsonb; payload jsonb;
