@@ -39,3 +39,9 @@ CREATE INDEX IF NOT EXISTS idx_bubble_sessions_user_date
 
 CREATE INDEX IF NOT EXISTS idx_bubble_messages_session
   ON bubble_messages (session_id, created_at);
+
+-- Data API 授权（Supabase 2026-10-30 起新表不再自动授权，建表的迁移必须自带 GRANT）
+REVOKE ALL ON TABLE public.bubble_sessions FROM anon;
+REVOKE ALL ON TABLE public.bubble_messages FROM anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.bubble_sessions TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.bubble_messages TO authenticated, service_role;

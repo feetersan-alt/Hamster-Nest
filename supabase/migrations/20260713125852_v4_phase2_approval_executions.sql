@@ -39,3 +39,8 @@ create policy "approval_executions_select_own"
 
 create index approval_executions_user_claimed_at_idx
   on public.approval_executions (user_id, claimed_at desc);
+
+-- Data API 授权（Supabase 2026-10-30 起新表不再自动授权，建表的迁移必须自带 GRANT）：客户端只读。
+revoke all on table public.approval_executions from anon;
+grant select on table public.approval_executions to authenticated;
+grant select, insert, update, delete on table public.approval_executions to service_role;
