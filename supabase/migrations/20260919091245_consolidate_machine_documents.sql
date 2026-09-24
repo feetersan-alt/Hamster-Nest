@@ -1,4 +1,10 @@
--- T55: owner-scoped cloud documents. Existing append-only publishing/locking/RLS applies.
+-- 仓鼠机文档收口（2026-09-19，T55 后续）
+--
+-- 承接 20260919082858_machine_cloud_documents.sql：把重复 / 退役的文档项失活（保留版本历史，
+-- 触发器阻止重新发布，见下方 retired 名单），新增 Codex 周日 23:00 备份任务配置；收口后 active
+-- 目录为 21 项。受影响的正文按「预读版本 / 内容哈希」守卫发布新版本，避免覆盖并发编辑。
+-- 验证：supabase/tests/machine_documents_consolidation.sql（事务内回滚）。
+
 CREATE OR REPLACE FUNCTION private.validate_machine_document()
 RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $fn$
 DECLARE spec jsonb; payload jsonb;
