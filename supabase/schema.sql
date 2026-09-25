@@ -14,7 +14,7 @@
 --        （或前端注册）你的账号，再在 SQL Editor 跑 `select id from auth.users;`
 --        拿到 UUID。原项目是单用户应用，部分 RLS 策略与列默认值绑定 owner UUID，
 --        不替换会导致登录后读不到 / 写不进数据。
---   2) YOUR_PROJECT_REF
+--   2) ckrbsdzfzfkxxfhexbfk
 --      → 替换成你自己的项目 ref（Dashboard → Project Settings → General）。
 --        只出现在 notify_push_dispatch() 的 Edge Function 回调 URL 里。
 --
@@ -4833,7 +4833,7 @@ begin
     return new;
   end if;
   perform net.http_post(
-    url := 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/push-dispatch',
+    url := 'https://ckrbsdzfzfkxxfhexbfk.supabase.co/functions/v1/push-dispatch',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'x-push-dispatch-secret', v_secret
