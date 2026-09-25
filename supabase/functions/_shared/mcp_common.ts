@@ -100,7 +100,19 @@ export function serveMcp(
       { name: serverName, version: MCP_VERSION },
       instructions ? { instructions } : undefined,
     )
-    registerTools(server)
+    const toolServer = new Proxy(server, {
+      get(target, property, receiver) {
+        if (property === 'registerTool') {
+          return (name: string, config: Record<string, unknown>, handler: unknown) =>
+            target.registerTool(name, {
+              ...config,
+              securitySchemes: config.securitySchemes ?? [{ type: 'oauth2', scopes: ['openid'] }],
+            }, handler as never)
+        }
+        return Reflect.get(target, property, receiver)
+      },
+    }) as McpServer
+    registerTools(toolServer)
     const transport = new WebStandardStreamableHTTPServerTransport()
     await server.connect(transport)
     return transport.handleRequest(c.req.raw)
