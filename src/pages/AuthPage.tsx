@@ -18,6 +18,14 @@ const AuthPage = ({ user }: AuthPageProps) => {
   const [verifying, setVerifying] = useState(false)
   const navigate = useNavigate()
 
+  const continueAfterAuth = useCallback(() => {
+    const returnUrl = window.sessionStorage.getItem('hamster-oauth-return')
+    if (!returnUrl) return false
+    window.sessionStorage.removeItem('hamster-oauth-return')
+    window.location.assign(returnUrl)
+    return true
+  }, [])
+
   useEffect(() => {
     if (!supabase) {
       return
@@ -27,20 +35,16 @@ const AuthPage = ({ user }: AuthPageProps) => {
       if (!active) {
         return
       }
-      if (data.session?.user) {
-        navigate('/')
-      }
+      if (data.session?.user && !continueAfterAuth()) navigate('/')
     })
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        navigate('/')
-      }
+      if (session?.user && !continueAfterAuth()) navigate('/')
     })
     return () => {
       active = false
       data.subscription.unsubscribe()
     }
-  }, [navigate])
+  }, [continueAfterAuth, navigate])
 
   const handleSendOtp = useCallback(async () => {
     const trimmed = email.trim().toLowerCase()
