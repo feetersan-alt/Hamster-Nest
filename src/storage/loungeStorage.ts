@@ -88,7 +88,10 @@ export const fetchLoungeSofa = async (sofaId: string): Promise<LoungeSofa | null
 export const createLoungeSofa = async (name: string): Promise<LoungeSofa> => {
   const client = requireClient()
   const { data, error } = await client
-    .rpc('lounge_manage', { p_action: 'create', p_id: crypto.randomUUID(), p_name: name })
+    .from('lounge_sofas')
+    .insert({ id: crypto.randomUUID(), name })
+    .select('id,name,created_at,updated_at')
+    .single()
   if (error || !data) {
     throw error ?? new Error('创建沙发失败')
   }
