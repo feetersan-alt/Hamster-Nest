@@ -2,6 +2,7 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { McpServer } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/mcp.js'
 import { WebStandardStreamableHTTPServerTransport } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/webStandardStreamableHttp.js'
 import { Hono } from 'npm:hono@^4.9.7'
+import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@^1.6.0'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { isMcpKeyAuthorized } from './mcp_key_auth.ts'
 import { getOwnerUserId } from './owner.ts'
@@ -33,24 +34,6 @@ const buildCorsHeaders = (origin: string): Record<string, string> => ({
   'Access-Control-Max-Age': '86400',
   Vary: 'Origin',
 })
-
-const isAuthorizedRequest = async (req: Request): Promise<boolean> => {
-  const expectedKey = Deno.env.get('HAMSTER_MCP_KEY') ?? ''
-  if (isMcpKeyAuthorized(req, expectedKey)) return true
-
-  const authHeader = req.headers.get('authorization')
-  if (!authHeader) return false
-  const apikey = req.headers.get('apikey')?.trim() ?? ''
-  if (!apikey) return false
-  try {
-    const authResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/auth/v1/user`, {
-      headers: { apikey, Authorization: authHeader },
-    })
-    return authResponse.ok
-  } catch {
-    return false
-  }
-}
 
 export const jsonResult = (value: unknown) => ({
   content: [{ type: 'text' as const, text: JSON.stringify(value, null, 2) }],
@@ -123,5 +106,28 @@ export function serveMcp(
     return transport.handleRequest(c.req.raw)
   })
 
-  Deno.serve(app.fetch)
+  const oauthHandler = withOAuthProtectedResource(
+    withSupabase({ auth: ['user', 'none'] }, async (req, ctx) => {
+      const key = Deno.env.get('HAMSTER_MCP_KEY') ?? ''
+      const keyAuthorized = isMcpKeyAuthorized(req, key)
+      const oauthAuthorized = ctx.authMode === 'user' && ctx.userClaims?.id === USER_ID
+
+      if (!keyAuthorized && !oauthAuthorized) {
+        if (ctx.authMode === 'user') {
+          return new Response(JSON.stringify({ error: 'forbidden' }), {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+        return new Response(JSON.stringify({ error: 'unauthorized' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+
+      return app.fetch(req)
+    }),
+  )
+
+  Deno.serve(oauthHandler)
 }
