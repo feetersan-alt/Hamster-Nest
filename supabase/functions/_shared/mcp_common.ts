@@ -73,9 +73,6 @@ export const clampLimit = (limit: number | undefined, fallback: number, max: num
 
 type ServeMcpOptions = {
   serverName?: string
-  // 随 initialize 握手下发一次的服务器级使用说明：放跨工具的共性约定（时区、枚举语义、
-  // 写入习惯等），工具描述里只留"做什么"。不是所有客户端都会注入 instructions，
-  // 关键触发时机仍由各客户端的系统提示负责。
   instructions?: string
 }
 
@@ -87,10 +84,6 @@ export function serveMcp(
   const { serverName = 'hamster-nest', instructions } =
     typeof options === 'string' ? { serverName: options, instructions: undefined } : options
   const app = new Hono().basePath(`/${functionName}`)
-  const server = new McpServer(
-    { name: serverName, version: MCP_VERSION },
-    instructions ? { instructions } : undefined,
-  )
 
   app.use('*', async (c, next) => {
     const origin = c.req.header('origin') ?? null
@@ -119,9 +112,12 @@ export function serveMcp(
     }
   })
 
-  registerTools(server)
-
   app.all('*', async (c) => {
+    const server = new McpServer(
+      { name: serverName, version: MCP_VERSION },
+      instructions ? { instructions } : undefined,
+    )
+    registerTools(server)
     const transport = new WebStandardStreamableHTTPServerTransport()
     await server.connect(transport)
     return transport.handleRequest(c.req.raw)
