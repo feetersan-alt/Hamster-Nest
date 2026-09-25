@@ -15,7 +15,11 @@ export const supabase = createClient(
   getSupabaseAdminKey(),
 )
 
-const allowedOrigins = ['https://chuan-101.github.io', /^http:\/\/localhost:\d+$/]
+const allowedOrigins = [
+  'https://chuan-101.github.io',
+  'https://feetersan-alt.github.io',
+  /^http:\/\/localhost:\d+$/,
+]
 
 const isAllowedOrigin = (origin: string) =>
   allowedOrigins.some((pattern) =>
