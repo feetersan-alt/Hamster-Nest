@@ -15,7 +15,7 @@
 # need privileged database access read the named edge_functions_20260715 key
 # from SUPABASE_SECRET_KEYS; the legacy service-role Bearer token is not an
 # accepted request credential.
-project_id = "crfhiumxzmaszkapanrb"
+project_id = "ckrbsdzfzfkxxfhexbfk"
 
 [functions.hamster-mcp]
 verify_jwt = false
