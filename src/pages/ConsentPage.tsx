@@ -58,11 +58,11 @@ export default function ConsentPage() {
         setLoading(false)
         return
       }
-      if (!('authorization_id' in data)) {
+      if ('redirect_url' in data && typeof data.redirect_url === 'string') {
         location.assign(data.redirect_url)
         return
       }
-      setDetails(data)
+      setDetails(data as AuthDetails)
       setLoading(false)
     })()
     return () => { active = false }
