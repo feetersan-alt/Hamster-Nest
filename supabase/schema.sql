@@ -9,7 +9,7 @@
 --       重跑；已有部署缺表缺列（报 42703 或表 404）的，直接重跑本文件即可补齐。
 --
 -- ⚠️ 运行前必须做的两个全局替换（编辑器查找替换即可）：
---   1) 11111111-1111-1111-1111-111111111111
+--   1) 9650bb97-aa3a-4da8-9263-a1e33753f75a
 --      → 替换成你自己的 auth 用户 UUID。先在 Dashboard → Authentication 创建
 --        （或前端注册）你的账号，再在 SQL Editor 跑 `select id from auth.users;`
 --        拿到 UUID。原项目是单用户应用，部分 RLS 策略与列默认值绑定 owner UUID，
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS public.agent_council (
   message text NOT NULL,
   read_by text[] DEFAULT ARRAY[]::text[],
   created_at timestamp with time zone DEFAULT now(),
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid,
   parent_id uuid,
   entry_type text,
   proposal_status text,
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS public.agent_events (
 
 CREATE TABLE IF NOT EXISTS public.agent_feed_items (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   type text NOT NULL,
   title text NOT NULL,
   summary text,
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS public.agent_settings (
 
 CREATE TABLE IF NOT EXISTS public.agent_tasks (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   source text NOT NULL,
   executor text NOT NULL,
   command text NOT NULL,
@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS public.approval_requests (
 
 CREATE TABLE IF NOT EXISTS public.archive_categories (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   parent_id uuid,
   scope text NOT NULL,
   name text NOT NULL,
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS public.archive_categories (
 
 CREATE TABLE IF NOT EXISTS public.archives (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   category_id uuid NOT NULL,
   title text NOT NULL,
   content text NOT NULL,
@@ -284,7 +284,7 @@ CREATE TABLE IF NOT EXISTS public.channel_config (
 
 CREATE TABLE IF NOT EXISTS public.checkin_logs (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   checkin_time timestamp with time zone DEFAULT now() NOT NULL,
   model text,
   input_summary text,
@@ -316,7 +316,7 @@ CREATE TABLE IF NOT EXISTS public.codex_control (
   status text DEFAULT 'pending'::text NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
   executed_at timestamp with time zone,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid
 );
 
 CREATE TABLE IF NOT EXISTS public.codex_tasks (
@@ -328,7 +328,7 @@ CREATE TABLE IF NOT EXISTS public.codex_tasks (
   created_at timestamp with time zone DEFAULT now(),
   started_at timestamp with time zone,
   completed_at timestamp with time zone,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid
 );
 
 CREATE TABLE IF NOT EXISTS public.compression_cache (
@@ -365,7 +365,7 @@ CREATE TABLE IF NOT EXISTS public.council_categories (
 
 CREATE TABLE IF NOT EXISTS public.current_context_snapshot (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   snapshot_type text DEFAULT 'current_status'::text NOT NULL,
   summary_text text NOT NULL,
   summary_json jsonb,
@@ -375,7 +375,7 @@ CREATE TABLE IF NOT EXISTS public.current_context_snapshot (
 
 CREATE TABLE IF NOT EXISTS public.daily_status_digest (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   date date NOT NULL,
   period_of_day text NOT NULL,
   summary_json jsonb,
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS public.daily_status_digest (
 
 CREATE TABLE IF NOT EXISTS public.device_status (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   latitude double precision,
   longitude double precision,
   battery_level integer,
@@ -491,7 +491,7 @@ CREATE TABLE IF NOT EXISTS public.generation_ports (
 
 CREATE TABLE IF NOT EXISTS public.ideas (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   category text,
   content text NOT NULL,
   source_context text,
@@ -671,7 +671,7 @@ CREATE TABLE IF NOT EXISTS public.notification_events (
 
 CREATE TABLE IF NOT EXISTS public.novel_books (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid,
   title text NOT NULL,
   description text DEFAULT ''::text,
   outline text DEFAULT ''::text,
@@ -686,7 +686,7 @@ CREATE TABLE IF NOT EXISTS public.novel_books (
 
 CREATE TABLE IF NOT EXISTS public.novel_chapters (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid,
   book_id uuid,
   chapter_number integer NOT NULL,
   title text DEFAULT ''::text,
@@ -727,7 +727,7 @@ CREATE TABLE IF NOT EXISTS public.pending_wechat_messages (
 
 CREATE TABLE IF NOT EXISTS public.print_capsules (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   type text NOT NULL,
   title text NOT NULL,
   content text NOT NULL,
@@ -792,7 +792,7 @@ CREATE TABLE IF NOT EXISTS public.push_subscriptions (
 
 CREATE TABLE IF NOT EXISTS public.quests (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   created_by text NOT NULL,
   title text NOT NULL,
   description text,
@@ -866,7 +866,7 @@ CREATE TABLE IF NOT EXISTS public.rp_story_groups (
 
 CREATE TABLE IF NOT EXISTS public.scheduled_wakeup (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   trigger_at timestamp with time zone NOT NULL,
   timezone text DEFAULT 'Asia/Shanghai'::text,
   message text NOT NULL,
@@ -1072,7 +1072,7 @@ CREATE TABLE IF NOT EXISTS public.user_settings (
 
 CREATE TABLE IF NOT EXISTS public.wallet_transactions (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   type text NOT NULL,
   points_delta integer DEFAULT 0 NOT NULL,
   coins_delta numeric(10,2) DEFAULT 0 NOT NULL,
@@ -1083,7 +1083,7 @@ CREATE TABLE IF NOT EXISTS public.wallet_transactions (
 
 CREATE TABLE IF NOT EXISTS public.wechat_messages (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid,
   role text NOT NULL,
   content text NOT NULL,
   created_at timestamp with time zone DEFAULT now()
@@ -1091,7 +1091,7 @@ CREATE TABLE IF NOT EXISTS public.wechat_messages (
 
 CREATE TABLE IF NOT EXISTS public.weekly_digest (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL,
   week_start date NOT NULL,
   week_end date NOT NULL,
   digest_json jsonb,
@@ -1102,7 +1102,7 @@ CREATE TABLE IF NOT EXISTS public.weekly_digest (
 
 CREATE TABLE IF NOT EXISTS public.wiki_entries (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
-  user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid,
+  user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid,
   title text NOT NULL,
   content text DEFAULT ''::text NOT NULL,
   category text DEFAULT '未分类'::text NOT NULL,
@@ -1123,7 +1123,7 @@ ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS topic text;
 ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS message text;
 ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS read_by text[] DEFAULT ARRAY[]::text[];
 ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now();
-ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid;
+ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid;
 ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS parent_id uuid;
 ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS entry_type text;
 ALTER TABLE public.agent_council ADD COLUMN IF NOT EXISTS proposal_status text;
@@ -1143,7 +1143,7 @@ ALTER TABLE public.agent_events ADD COLUMN IF NOT EXISTS payload jsonb DEFAULT '
 ALTER TABLE public.agent_events ADD COLUMN IF NOT EXISTS importance text DEFAULT 'normal'::text NOT NULL;
 ALTER TABLE public.agent_events ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now() NOT NULL;
 ALTER TABLE public.agent_feed_items ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.agent_feed_items ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.agent_feed_items ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.agent_feed_items ADD COLUMN IF NOT EXISTS type text;
 ALTER TABLE public.agent_feed_items ADD COLUMN IF NOT EXISTS title text;
 ALTER TABLE public.agent_feed_items ADD COLUMN IF NOT EXISTS summary text;
@@ -1200,7 +1200,7 @@ ALTER TABLE public.agent_settings ADD COLUMN IF NOT EXISTS wechat_memory_search_
 ALTER TABLE public.agent_settings ADD COLUMN IF NOT EXISTS wechat_memory_search_enabled boolean DEFAULT true;
 ALTER TABLE public.agent_settings ADD COLUMN IF NOT EXISTS agent_mode text DEFAULT 'active'::text;
 ALTER TABLE public.agent_tasks ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.agent_tasks ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.agent_tasks ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.agent_tasks ADD COLUMN IF NOT EXISTS source text;
 ALTER TABLE public.agent_tasks ADD COLUMN IF NOT EXISTS executor text;
 ALTER TABLE public.agent_tasks ADD COLUMN IF NOT EXISTS command text;
@@ -1237,7 +1237,7 @@ ALTER TABLE public.approval_requests ADD COLUMN IF NOT EXISTS expires_at timesta
 ALTER TABLE public.approval_requests ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now() NOT NULL;
 ALTER TABLE public.approval_requests ADD COLUMN IF NOT EXISTS responded_at timestamp with time zone;
 ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS parent_id uuid;
 ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS scope text;
 ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS name text;
@@ -1245,7 +1245,7 @@ ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS sort_order intege
 ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.archive_categories ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.archives ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.archives ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.archives ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.archives ADD COLUMN IF NOT EXISTS category_id uuid;
 ALTER TABLE public.archives ADD COLUMN IF NOT EXISTS title text;
 ALTER TABLE public.archives ADD COLUMN IF NOT EXISTS content text;
@@ -1305,7 +1305,7 @@ ALTER TABLE public.channel_config ADD COLUMN IF NOT EXISTS active_model text;
 ALTER TABLE public.channel_config ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now() NOT NULL;
 ALTER TABLE public.channel_config ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT now() NOT NULL;
 ALTER TABLE public.checkin_logs ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.checkin_logs ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.checkin_logs ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.checkin_logs ADD COLUMN IF NOT EXISTS checkin_time timestamp with time zone DEFAULT now() NOT NULL;
 ALTER TABLE public.checkin_logs ADD COLUMN IF NOT EXISTS model text;
 ALTER TABLE public.checkin_logs ADD COLUMN IF NOT EXISTS input_summary text;
@@ -1331,7 +1331,7 @@ ALTER TABLE public.codex_control ADD COLUMN IF NOT EXISTS source text DEFAULT 'm
 ALTER TABLE public.codex_control ADD COLUMN IF NOT EXISTS status text DEFAULT 'pending'::text NOT NULL;
 ALTER TABLE public.codex_control ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.codex_control ADD COLUMN IF NOT EXISTS executed_at timestamp with time zone;
-ALTER TABLE public.codex_control ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid;
+ALTER TABLE public.codex_control ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid;
 ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
 ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS task text;
 ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS source text DEFAULT 'syzygy'::text NOT NULL;
@@ -1340,7 +1340,7 @@ ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS result text;
 ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS started_at timestamp with time zone;
 ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS completed_at timestamp with time zone;
-ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid;
+ALTER TABLE public.codex_tasks ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid;
 ALTER TABLE public.compression_cache ADD COLUMN IF NOT EXISTS conversation_id uuid;
 ALTER TABLE public.compression_cache ADD COLUMN IF NOT EXISTS compressed_up_to_message_id uuid;
 ALTER TABLE public.compression_cache ADD COLUMN IF NOT EXISTS summary_text text;
@@ -1365,14 +1365,14 @@ ALTER TABLE public.council_categories ADD COLUMN IF NOT EXISTS key text;
 ALTER TABLE public.council_categories ADD COLUMN IF NOT EXISTS label text;
 ALTER TABLE public.council_categories ADD COLUMN IF NOT EXISTS sort_order integer;
 ALTER TABLE public.current_context_snapshot ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.current_context_snapshot ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.current_context_snapshot ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.current_context_snapshot ADD COLUMN IF NOT EXISTS snapshot_type text DEFAULT 'current_status'::text NOT NULL;
 ALTER TABLE public.current_context_snapshot ADD COLUMN IF NOT EXISTS summary_text text;
 ALTER TABLE public.current_context_snapshot ADD COLUMN IF NOT EXISTS summary_json jsonb;
 ALTER TABLE public.current_context_snapshot ADD COLUMN IF NOT EXISTS stale_after timestamp with time zone;
 ALTER TABLE public.current_context_snapshot ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS date date;
 ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS period_of_day text;
 ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS summary_json jsonb;
@@ -1382,7 +1382,7 @@ ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS created_at times
 ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS source_range_start timestamp with time zone;
 ALTER TABLE public.daily_status_digest ADD COLUMN IF NOT EXISTS source_range_end timestamp with time zone;
 ALTER TABLE public.device_status ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.device_status ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.device_status ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.device_status ADD COLUMN IF NOT EXISTS latitude double precision;
 ALTER TABLE public.device_status ADD COLUMN IF NOT EXISTS longitude double precision;
 ALTER TABLE public.device_status ADD COLUMN IF NOT EXISTS battery_level integer;
@@ -1464,7 +1464,7 @@ ALTER TABLE public.generation_ports ADD COLUMN IF NOT EXISTS active boolean DEFA
 ALTER TABLE public.generation_ports ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now() NOT NULL;
 ALTER TABLE public.generation_ports ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT now() NOT NULL;
 ALTER TABLE public.ideas ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.ideas ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.ideas ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.ideas ADD COLUMN IF NOT EXISTS category text;
 ALTER TABLE public.ideas ADD COLUMN IF NOT EXISTS content text;
 ALTER TABLE public.ideas ADD COLUMN IF NOT EXISTS source_context text;
@@ -1593,7 +1593,7 @@ ALTER TABLE public.notification_events ADD COLUMN IF NOT EXISTS created_at times
 ALTER TABLE public.notification_events ADD COLUMN IF NOT EXISTS ticket_id text;
 ALTER TABLE public.notification_events ADD COLUMN IF NOT EXISTS receipt_checked_at timestamp with time zone;
 ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid;
+ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid;
 ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS title text;
 ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS description text DEFAULT ''::text;
 ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS outline text DEFAULT ''::text;
@@ -1605,7 +1605,7 @@ ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS created_at timestamp wit
 ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.novel_books ADD COLUMN IF NOT EXISTS summary text DEFAULT ''::text;
 ALTER TABLE public.novel_chapters ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.novel_chapters ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid;
+ALTER TABLE public.novel_chapters ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid;
 ALTER TABLE public.novel_chapters ADD COLUMN IF NOT EXISTS book_id uuid;
 ALTER TABLE public.novel_chapters ADD COLUMN IF NOT EXISTS chapter_number integer;
 ALTER TABLE public.novel_chapters ADD COLUMN IF NOT EXISTS title text DEFAULT ''::text;
@@ -1637,7 +1637,7 @@ ALTER TABLE public.pending_wechat_messages ADD COLUMN IF NOT EXISTS sent_at time
 ALTER TABLE public.pending_wechat_messages ADD COLUMN IF NOT EXISTS locked_at timestamp with time zone;
 ALTER TABLE public.pending_wechat_messages ADD COLUMN IF NOT EXISTS processing_by text;
 ALTER TABLE public.print_capsules ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.print_capsules ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.print_capsules ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.print_capsules ADD COLUMN IF NOT EXISTS type text;
 ALTER TABLE public.print_capsules ADD COLUMN IF NOT EXISTS title text;
 ALTER TABLE public.print_capsules ADD COLUMN IF NOT EXISTS content text;
@@ -1687,7 +1687,7 @@ ALTER TABLE public.push_subscriptions ADD COLUMN IF NOT EXISTS created_at timest
 ALTER TABLE public.push_subscriptions ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.push_subscriptions ADD COLUMN IF NOT EXISTS platform text DEFAULT 'web'::text NOT NULL;
 ALTER TABLE public.quests ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.quests ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.quests ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.quests ADD COLUMN IF NOT EXISTS created_by text;
 ALTER TABLE public.quests ADD COLUMN IF NOT EXISTS title text;
 ALTER TABLE public.quests ADD COLUMN IF NOT EXISTS description text;
@@ -1743,7 +1743,7 @@ ALTER TABLE public.rp_story_groups ADD COLUMN IF NOT EXISTS description text;
 ALTER TABLE public.rp_story_groups ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.rp_story_groups ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.scheduled_wakeup ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.scheduled_wakeup ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.scheduled_wakeup ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.scheduled_wakeup ADD COLUMN IF NOT EXISTS trigger_at timestamp with time zone;
 ALTER TABLE public.scheduled_wakeup ADD COLUMN IF NOT EXISTS timezone text DEFAULT 'Asia/Shanghai'::text;
 ALTER TABLE public.scheduled_wakeup ADD COLUMN IF NOT EXISTS message text;
@@ -1901,7 +1901,7 @@ ALTER TABLE public.user_settings ADD COLUMN IF NOT EXISTS bubble_chat_temperatur
 ALTER TABLE public.user_settings ADD COLUMN IF NOT EXISTS bubble_chat_reasoning_enabled boolean DEFAULT false;
 ALTER TABLE public.user_settings ADD COLUMN IF NOT EXISTS lounge_scene_prompt text;
 ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS type text;
 ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS points_delta integer DEFAULT 0 NOT NULL;
 ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS coins_delta numeric(10,2) DEFAULT 0 NOT NULL;
@@ -1909,12 +1909,12 @@ ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS description text
 ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS quest_id uuid;
 ALTER TABLE public.wallet_transactions ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now() NOT NULL;
 ALTER TABLE public.wechat_messages ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.wechat_messages ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid;
+ALTER TABLE public.wechat_messages ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid;
 ALTER TABLE public.wechat_messages ADD COLUMN IF NOT EXISTS role text;
 ALTER TABLE public.wechat_messages ADD COLUMN IF NOT EXISTS content text;
 ALTER TABLE public.wechat_messages ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid NOT NULL;
+ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid NOT NULL;
 ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS week_start date;
 ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS week_end date;
 ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS digest_json jsonb;
@@ -1922,7 +1922,7 @@ ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS digest_text text;
 ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS highlights text[];
 ALTER TABLE public.weekly_digest ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now();
 ALTER TABLE public.wiki_entries ADD COLUMN IF NOT EXISTS id uuid DEFAULT gen_random_uuid() NOT NULL;
-ALTER TABLE public.wiki_entries ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid;
+ALTER TABLE public.wiki_entries ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid;
 ALTER TABLE public.wiki_entries ADD COLUMN IF NOT EXISTS title text;
 ALTER TABLE public.wiki_entries ADD COLUMN IF NOT EXISTS content text DEFAULT ''::text NOT NULL;
 ALTER TABLE public.wiki_entries ADD COLUMN IF NOT EXISTS category text DEFAULT '未分类'::text NOT NULL;
@@ -4136,7 +4136,7 @@ begin
 end;
 $function$;
 
-CREATE OR REPLACE FUNCTION public.complete_quest(p_quest_id uuid, p_note text DEFAULT NULL::text, p_user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid)
+CREATE OR REPLACE FUNCTION public.complete_quest(p_quest_id uuid, p_note text DEFAULT NULL::text, p_user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid)
  RETURNS jsonb
  LANGUAGE plpgsql
  SET search_path TO 'public'
@@ -4644,7 +4644,7 @@ begin
 end;
 $function$;
 
-CREATE OR REPLACE FUNCTION public.exchange_points_to_coins(p_points integer, p_user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid)
+CREATE OR REPLACE FUNCTION public.exchange_points_to_coins(p_points integer, p_user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid)
  RETURNS jsonb
  LANGUAGE plpgsql
  SET search_path TO 'public'
@@ -5159,7 +5159,7 @@ begin
 end;
 $function$;
 
-CREATE OR REPLACE FUNCTION public.spend_coins(p_amount numeric, p_description text, p_user_id uuid DEFAULT '11111111-1111-1111-1111-111111111111'::uuid)
+CREATE OR REPLACE FUNCTION public.spend_coins(p_amount numeric, p_description text, p_user_id uuid DEFAULT '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid)
  RETURNS jsonb
  LANGUAGE plpgsql
  SET search_path TO 'public'
@@ -5601,8 +5601,8 @@ CREATE POLICY channel_config_update_own ON public.channel_config FOR UPDATE TO p
 
 DROP POLICY IF EXISTS "Allow all for owner" ON public.checkin_logs;
 CREATE POLICY "Allow all for owner" ON public.checkin_logs FOR ALL TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid))
-  WITH CHECK ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid))
+  WITH CHECK ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS checkins_delete_own ON public.checkins;
 CREATE POLICY checkins_delete_own ON public.checkins FOR DELETE TO authenticated
@@ -5660,11 +5660,11 @@ CREATE POLICY council_categories_update ON public.council_categories FOR UPDATE 
 
 DROP POLICY IF EXISTS frontend_read_current_context_snapshot ON public.current_context_snapshot;
 CREATE POLICY frontend_read_current_context_snapshot ON public.current_context_snapshot FOR SELECT TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS frontend_read_daily_status_digest ON public.daily_status_digest;
 CREATE POLICY frontend_read_daily_status_digest ON public.daily_status_digest FOR SELECT TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS device_status_insert_own ON public.device_status;
 CREATE POLICY device_status_insert_own ON public.device_status FOR INSERT TO authenticated
@@ -5765,7 +5765,7 @@ CREATE POLICY generation_ports_select_own ON public.generation_ports FOR SELECT 
 
 DROP POLICY IF EXISTS frontend_read_ideas ON public.ideas;
 CREATE POLICY frontend_read_ideas ON public.ideas FOR SELECT TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS authenticated_all ON public.knowledge_folders;
 CREATE POLICY authenticated_all ON public.knowledge_folders FOR ALL TO authenticated
@@ -5967,7 +5967,7 @@ CREATE POLICY "Users can update own pending messages" ON public.pending_wechat_m
 
 DROP POLICY IF EXISTS frontend_read_print_capsules ON public.print_capsules;
 CREATE POLICY frontend_read_print_capsules ON public.print_capsules FOR SELECT TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS prompt_templates_select_own ON public.prompt_templates;
 CREATE POLICY prompt_templates_select_own ON public.prompt_templates FOR SELECT TO authenticated
@@ -6025,8 +6025,8 @@ CREATE POLICY "Users can update own subscriptions" ON public.push_subscriptions 
 
 DROP POLICY IF EXISTS "Allow all for owner" ON public.quests;
 CREATE POLICY "Allow all for owner" ON public.quests FOR ALL TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid))
-  WITH CHECK ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid))
+  WITH CHECK ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS authenticated_delete ON public.rp_messages;
 CREATE POLICY authenticated_delete ON public.rp_messages FOR DELETE TO authenticated
@@ -6089,7 +6089,7 @@ CREATE POLICY "Users can manage own story groups" ON public.rp_story_groups FOR 
 
 DROP POLICY IF EXISTS frontend_read_scheduled_wakeup ON public.scheduled_wakeup;
 CREATE POLICY frontend_read_scheduled_wakeup ON public.scheduled_wakeup FOR SELECT TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS sessions_delete_own ON public.sessions;
 CREATE POLICY sessions_delete_own ON public.sessions FOR DELETE TO public
@@ -6317,13 +6317,13 @@ CREATE POLICY timeline_entries_update_own ON public.timeline_entries FOR UPDATE 
 
 DROP POLICY IF EXISTS "Users can manage own todo_categories" ON public.todo_categories;
 CREATE POLICY "Users can manage own todo_categories" ON public.todo_categories FOR ALL TO public
-  USING (((user_id = ( SELECT auth.uid() AS uid)) OR (user_id = '11111111-1111-1111-1111-111111111111'::uuid)))
-  WITH CHECK (((user_id = ( SELECT auth.uid() AS uid)) OR (user_id = '11111111-1111-1111-1111-111111111111'::uuid)));
+  USING (((user_id = ( SELECT auth.uid() AS uid)) OR (user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid)))
+  WITH CHECK (((user_id = ( SELECT auth.uid() AS uid)) OR (user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid)));
 
 DROP POLICY IF EXISTS "Users can manage own todos" ON public.todos;
 CREATE POLICY "Users can manage own todos" ON public.todos FOR ALL TO public
-  USING (((user_id = ( SELECT auth.uid() AS uid)) OR (user_id = '11111111-1111-1111-1111-111111111111'::uuid)))
-  WITH CHECK (((user_id = ( SELECT auth.uid() AS uid)) OR (user_id = '11111111-1111-1111-1111-111111111111'::uuid)));
+  USING (((user_id = ( SELECT auth.uid() AS uid)) OR (user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid)))
+  WITH CHECK (((user_id = ( SELECT auth.uid() AS uid)) OR (user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid)));
 
 DROP POLICY IF EXISTS usage_quota_select_authenticated ON public.usage_quota;
 CREATE POLICY usage_quota_select_authenticated ON public.usage_quota FOR SELECT TO authenticated
@@ -6344,17 +6344,17 @@ CREATE POLICY user_settings_update_own ON public.user_settings FOR UPDATE TO pub
 
 DROP POLICY IF EXISTS "Allow all for owner" ON public.wallet_transactions;
 CREATE POLICY "Allow all for owner" ON public.wallet_transactions FOR ALL TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid))
-  WITH CHECK ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid))
+  WITH CHECK ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS "Allow all for authenticated user" ON public.wechat_messages;
 CREATE POLICY "Allow all for authenticated user" ON public.wechat_messages FOR ALL TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid))
-  WITH CHECK ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid))
+  WITH CHECK ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS frontend_read_weekly_digest ON public.weekly_digest;
 CREATE POLICY frontend_read_weekly_digest ON public.weekly_digest FOR SELECT TO authenticated
-  USING ((user_id = '11111111-1111-1111-1111-111111111111'::uuid));
+  USING ((user_id = '9650bb97-aa3a-4da8-9263-a1e33753f75a'::uuid));
 
 DROP POLICY IF EXISTS "User can manage own wiki_entries" ON public.wiki_entries;
 CREATE POLICY "User can manage own wiki_entries" ON public.wiki_entries FOR ALL TO public
