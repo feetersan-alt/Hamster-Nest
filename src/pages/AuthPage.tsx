@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { User } from '@supabase/supabase-js'
 import { friendlyAuthError } from '../lib/authErrors'
@@ -11,11 +11,12 @@ type AuthPageProps = {
 
 const AuthPage = ({ user }: AuthPageProps) => {
   const [email, setEmail] = useState('')
-  const [otp, setOtp] = useState('')
+  const [password, setPassword] = useState('')
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [sending, setSending] = useState(false)
-  const [verifying, setVerifying] = useState(false)
+  const [signingIn, setSigningIn] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const sessionReadyRef = useRef(false)
   const navigate = useNavigate()
 
   const continueAfterAuth = useCallback(() => {
@@ -27,83 +28,73 @@ const AuthPage = ({ user }: AuthPageProps) => {
   }, [])
 
   useEffect(() => {
-    if (!supabase) {
+    const client = supabase
+    if (!client) {
+      sessionReadyRef.current = true
+      setIsLoading(false)
       return
     }
+
     let active = true
-    supabase.auth.getSession().then(({ data }) => {
+    const initializeSession = async () => {
+      const { data } = await client.auth.getSession()
       if (!active) {
         return
       }
-      if (data.session?.user && !continueAfterAuth()) navigate('/')
+      sessionReadyRef.current = true
+      setIsLoading(false)
+      if (data.session?.user && !continueAfterAuth()) {
+        navigate('/', { replace: true })
+      }
+    }
+
+    void initializeSession()
+
+    const { data } = client.auth.onAuthStateChange((_event, session) => {
+      if (!sessionReadyRef.current || !session?.user) {
+        return
+      }
+      if (!continueAfterAuth()) {
+        navigate('/', { replace: true })
+      }
     })
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user && !continueAfterAuth()) navigate('/')
-    })
+
     return () => {
       active = false
       data.subscription.unsubscribe()
     }
   }, [continueAfterAuth, navigate])
 
-  const handleSendOtp = useCallback(async () => {
-    const trimmed = email.trim().toLowerCase()
-    if (!trimmed) {
-      setError('请输入邮箱地址。')
-      return
-    }
-    if (!supabase) {
-      setError('尚未配置 Supabase 环境变量。')
-      return
-    }
-    setSending(true)
-    setError(null)
-    setStatus(null)
-    const { error: signInError } = await supabase.auth.signInWithOtp({
-      email: trimmed,
-      options: {
-        shouldCreateUser: false,
-        emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`,
-      },
-    })
-    setSending(false)
-    if (signInError) {
-      setError(friendlyAuthError(signInError, '验证码发送失败，请稍后再试。'))
-      return
-    }
-    setStatus('验证码已发送，请查收邮箱。')
-  }, [email])
-
-  const handleVerifyOtp = useCallback(async () => {
+  const handleSignIn = useCallback(async () => {
     const trimmedEmail = email.trim().toLowerCase()
-    const trimmedOtp = otp.trim()
     if (!trimmedEmail) {
       setError('请输入邮箱地址。')
       return
     }
-    if (!trimmedOtp) {
-      setError('请输入验证码。')
+    if (!password) {
+      setError('请输入密码。')
       return
     }
     if (!supabase) {
       setError('尚未配置 Supabase 环境变量。')
       return
     }
-    setVerifying(true)
+
+    setSigningIn(true)
     setError(null)
     setStatus(null)
-    const { error: verifyError } = await supabase.auth.verifyOtp({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email: trimmedEmail,
-      token: trimmedOtp,
-      type: 'email',
+      password,
     })
-    setVerifying(false)
-    if (verifyError) {
-      setError(friendlyAuthError(verifyError, '验证码无效或已过期。'))
+    setSigningIn(false)
+
+    if (signInError) {
+      setError(friendlyAuthError(signInError, '邮箱或密码错误，请检查后再试。'))
       return
     }
     setStatus('登录成功，欢迎回来。')
-  }, [email, otp])
+  }, [email, password])
 
   const handleLogout = useCallback(async () => {
     if (!supabase) {
@@ -126,55 +117,48 @@ const AuthPage = ({ user }: AuthPageProps) => {
         </div>
         <h1 className="ui-title">Welcome to Hamster Nest</h1>
         <p className="subtitle">Enter your password to unlock your secret lair</p>
+
         <label className="field">
           <span className="field-label">邮箱地址</span>
           <div className="input-shell">
-            <span className="input-icon" aria-hidden="true">
-              @
-            </span>
+            <span className="input-icon" aria-hidden="true">@</span>
             <input
               type="email"
               placeholder="输入你的邮箱"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
             />
           </div>
         </label>
-        <button
-          type="button"
-          className="primary"
-          onClick={handleSendOtp}
-          disabled={sending}
-        >
-          {sending ? '发送中...' : '发送验证码 ✨'}
-        </button>
+
         <label className="field">
-          <span className="field-label">验证码</span>
+          <span className="field-label">密码</span>
           <div className="input-shell">
-            <span className="input-icon" aria-hidden="true">
-              #
-            </span>
+            <span className="input-icon" aria-hidden="true">*</span>
             <input
-              type="text"
-              placeholder="输入邮箱中的验证码"
-              value={otp}
-              onChange={(event) => setOtp(event.target.value)}
+              type="password"
+              placeholder="输入你的密码"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="current-password"
             />
           </div>
         </label>
+
         <button
           type="button"
           className="primary"
-          onClick={handleVerifyOtp}
-          disabled={verifying}
+          onClick={handleSignIn}
+          disabled={signingIn || isLoading}
         >
-          {verifying ? '验证中...' : '验证并登录 ✨'}
+          {signingIn ? '登录中...' : '登录 ✨'}
         </button>
-        <button type="button" className="forgot-link" onClick={handleSendOtp}>
-          Forgot Password?
-        </button>
+
+        {isLoading ? <p className="status">正在检查登录状态...</p> : null}
         {status ? <p className="status">{status}</p> : null}
         {error ? <p className="error">{error}</p> : null}
+
         <div className="divider" />
         {user ? (
           <div className="auth-user">
