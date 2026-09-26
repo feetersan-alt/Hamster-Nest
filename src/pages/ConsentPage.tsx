@@ -136,6 +136,11 @@ export default function ConsentPage() {
         return
       }
 
+      // Supabase's OAuth response is a discriminated union. After checking
+      // result.error above, TypeScript can narrow that property to never.
+      // Snapshot it before the narrowing so the diagnostic path can still
+      // report the original SDK result without triggering TS2339.
+      const resultError = result.error
       const redirectUrl = result.data?.redirect_url
       if (redirectUrl) {
         logOAuth('redirect_url received; navigating to callback', redirectUrl)
@@ -145,7 +150,7 @@ export default function ConsentPage() {
 
       const rawResult = formatOAuthError(result)
       logOAuth('OAuth SDK returned no redirect_url', result)
-      setError(`OAuth 授权失败：approveAuthorization 没有返回 redirect_url。result.error：${result.error ? formatOAuthError(result.error) : 'null'}。完整结果：${rawResult}`)
+      setError(`OAuth 授权失败：approveAuthorization 没有返回 redirect_url。result.error：${resultError ? formatOAuthError(resultError) : 'null'}。完整结果：${rawResult}`)
       setWorking(false)
     } catch (caught) {
       const message = formatOAuthError(caught)
