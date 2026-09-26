@@ -19,8 +19,11 @@ export default function ConsentPage() {
   const [error, setError] = useState<string | null>(null)
 
   const goLogin = useCallback(() => {
-    sessionStorage.setItem(RETURN_KEY, location.href)
-    location.assign(`${import.meta.env.BASE_URL}#/auth`)
+    const returnUrl = location.href
+    sessionStorage.setItem(RETURN_KEY, returnUrl)
+    const loginUrl = new URL(`${import.meta.env.BASE_URL}#/auth`, location.origin)
+    loginUrl.searchParams.set('oauth_return', returnUrl)
+    location.assign(loginUrl.href)
   }, [])
 
   useEffect(() => {
