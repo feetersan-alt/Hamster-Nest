@@ -11,6 +11,22 @@ type AuthDetails = {
 
 const RETURN_KEY = 'hamster-oauth-return'
 
+function formatOAuthError(error: unknown): string {
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}`
+  }
+  if (typeof error === 'string') return error
+  try {
+    return JSON.stringify(error, null, 2)
+  } catch {
+    return String(error)
+  }
+}
+
+function logOAuth(label: string, value: unknown) {
+  console.error(`[Hamster-Nest OAuth] ${label}`, value)
+}
+
 export default function ConsentPage() {
   const [details, setDetails] = useState<AuthDetails | null>(null)
   const [authorizationId, setAuthorizationId] = useState<string | null>(null)
@@ -29,66 +45,114 @@ export default function ConsentPage() {
   useEffect(() => {
     let active = true
     void (async () => {
-      if (!supabase) {
-        setError('Supabase 尚未配置。')
-        setLoading(false)
-        return
-      }
-      const { data: sessionData } = await supabase.auth.getSession()
-      if (!active) return
-      if (!sessionData.session?.user) {
-        goLogin()
-        return
-      }
+      try {
+        if (!supabase) {
+          setError('Supabase 尚未配置。')
+          setLoading(false)
+          return
+        }
 
-      const id = new URLSearchParams(location.search).get('authorization_id')
-      if (!id) {
-        setError('缺少 authorization_id。')
-        setLoading(false)
-        return
-      }
-      setAuthorizationId(id)
+        const sessionResult = await supabase.auth.getSession()
+        logOAuth('getSession result', sessionResult)
+        const { data: sessionData, error: sessionError } = sessionResult
+        if (!active) return
 
-      const { data, error: requestError } = await supabase.auth.oauth.getAuthorizationDetails(id)
-      if (!active) return
-      if (requestError) {
-        setError(requestError.message)
+        if (sessionError) {
+          throw sessionError
+        }
+
+        if (!sessionData.session?.user) {
+          goLogin()
+          return
+        }
+
+        const id = new URLSearchParams(location.search).get('authorization_id')
+        if (!id) {
+          setError('缺少 authorization_id。')
+          setLoading(false)
+          return
+        }
+        setAuthorizationId(id)
+
+        const result = await supabase.auth.oauth.getAuthorizationDetails(id)
+        logOAuth('getAuthorizationDetails result', result)
+        if (!active) return
+
+        if (result.error) {
+          throw result.error
+        }
+
+        const data = result.data
+        if (!data) {
+          setError('OAuth 授权请求不存在或已过期。')
+          setLoading(false)
+          return
+        }
+
+        if ('redirect_url' in data && typeof data.redirect_url === 'string') {
+          logOAuth('already-approved redirect_url', data.redirect_url)
+          location.assign(data.redirect_url)
+          return
+        }
+
+        setDetails(data as AuthDetails)
         setLoading(false)
-        return
-      }
-      if (!data) {
-        setError('OAuth 授权请求不存在或已过期。')
+      } catch (caught) {
+        const message = formatOAuthError(caught)
+        logOAuth('ConsentPage initialization error', caught)
+        if (!active) return
+        setError(`OAuth 初始化失败：${message}`)
         setLoading(false)
-        return
       }
-      if ('redirect_url' in data && typeof data.redirect_url === 'string') {
-        location.assign(data.redirect_url)
-        return
-      }
-      setDetails(data as AuthDetails)
-      setLoading(false)
     })()
-    return () => { active = false }
+
+    return () => {
+      active = false
+    }
   }, [goLogin])
 
   const decide = async (approve: boolean) => {
-    if (!supabase || !authorizationId) return
+    if (!supabase || !authorizationId) {
+      setError('无法授权：Supabase 或 authorization_id 不存在。')
+      return
+    }
+
     setWorking(true)
     setError(null)
-    const result = approve
-      ? await supabase.auth.oauth.approveAuthorization(authorizationId)
-      : await supabase.auth.oauth.denyAuthorization(authorizationId)
-    if (result.error) {
-      setError(result.error.message)
+    logOAuth('authorization decision', { approve, authorizationId })
+
+    try {
+      const result = approve
+        ? await supabase.auth.oauth.approveAuthorization(authorizationId)
+        : await supabase.auth.oauth.denyAuthorization(authorizationId)
+
+      logOAuth(approve ? 'approveAuthorization result' : 'denyAuthorization result', result)
+
+      if (result.error) {
+        const message = formatOAuthError(result.error)
+        logOAuth('OAuth SDK returned an error', result.error)
+        setError(`OAuth 授权失败：${message}`)
+        setWorking(false)
+        return
+      }
+
+      const redirectUrl = result.data?.redirect_url
+      if (redirectUrl) {
+        logOAuth('redirect_url received; navigating to callback', redirectUrl)
+        location.assign(redirectUrl)
+        return
+      }
+
+      const rawResult = formatOAuthError(result)
+      logOAuth('OAuth SDK returned no redirect_url', result)
+      setError(`OAuth 授权失败：approveAuthorization 没有返回 redirect_url。result.error：${result.error ? formatOAuthError(result.error) : 'null'}。完整结果：${rawResult}`)
       setWorking(false)
-      return
+    } catch (caught) {
+      const message = formatOAuthError(caught)
+      logOAuth('approveAuthorization threw an exception', caught)
+      setError(`OAuth 授权异常：${message}`)
+      setWorking(false)
     }
-    if (result.data?.redirect_url) {
-      location.assign(result.data.redirect_url)
-      return
-    }
-    setError('OAuth 没有返回重定向地址。')
-    setWorking(false)
   }
 
   if (loading) return <main style={s.page}><section style={s.card}>正在准备授权请求…</section></main>
@@ -123,5 +187,5 @@ const s: Record<string, React.CSSProperties> = {
   icon:{fontSize:42},eyebrow:{marginTop:8,fontSize:12,letterSpacing:'.14em',opacity:.55},title:{margin:'8px 0 12px',fontSize:30},
   text:{lineHeight:1.65,color:'#5d554d'},section:{marginTop:24,paddingTop:18,borderTop:'1px solid #eee9e2'},scopes:{display:'flex',flexWrap:'wrap',gap:8,marginTop:10},
   scope:{padding:'6px 10px',borderRadius:999,background:'#f0ede7',fontSize:13},muted:{color:'#777067'},uri:{wordBreak:'break-all',color:'#6c655d',fontSize:13,lineHeight:1.5},
-  actions:{display:'grid',gap:10,marginTop:28},primary:{border:0,borderRadius:12,padding:'13px 16px',background:'#27231f',color:'#fff',fontSize:15},secondary:{border:'1px solid #d8d1c8',borderRadius:12,padding:'13px 16px',background:'#fff',color:'#27231f',fontSize:15},error:{color:'#a33d32',lineHeight:1.6}
+  actions:{display:'grid',gap:10,marginTop:28},primary:{border:0,borderRadius:12,padding:'13px 16px',background:'#27231f',color:'#fff',fontSize:15},secondary:{border:'1px solid #d8d1c8',borderRadius:12,padding:'13px 16px',background:'#fff',color:'#27231f'},error:{color:'#a33d32',lineHeight:1.6,whiteSpace:'pre-wrap',wordBreak:'break-word'}
 }
