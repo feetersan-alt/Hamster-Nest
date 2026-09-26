@@ -533,19 +533,30 @@ const App = () => {
   }, [refreshRemoteSessionMessages])
 
   useEffect(() => {
-    if (!supabase) {
+    const client = supabase
+    if (!client) {
       setAuthReady(true)
       return
     }
-    supabase.auth.getSession().then(({ data }) => {
+
+    let active = true
+    const initializeAuth = async () => {
+      const { data } = await client.auth.getSession()
+      if (!active) {
+        return
+      }
       setUser(data.session?.user ?? null)
       setAuthReady(true)
-    })
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    }
+
+    void initializeAuth()
+
+    const { data } = client.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
-      setAuthReady(true)
     })
+
     return () => {
+      active = false
       data.subscription.unsubscribe()
     }
   }, [])
