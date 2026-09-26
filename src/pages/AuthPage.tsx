@@ -20,11 +20,29 @@ const AuthPage = ({ user }: AuthPageProps) => {
   const navigate = useNavigate()
 
   const continueAfterAuth = useCallback(() => {
-    const returnUrl = window.sessionStorage.getItem('hamster-oauth-return')
-    if (!returnUrl) return false
+    const params = new URLSearchParams(window.location.search)
+    const returnUrl =
+      params.get('oauth_return') ??
+      window.sessionStorage.getItem('hamster-oauth-return')
+
+    if (!returnUrl) {
+      return false
+    }
+
     window.sessionStorage.removeItem('hamster-oauth-return')
-    window.location.assign(returnUrl)
-    return true
+
+    try {
+      const parsed = new URL(returnUrl, window.location.origin)
+      if (parsed.origin !== window.location.origin) {
+        window.location.assign(parsed.href)
+        return true
+      }
+      window.location.assign(parsed.href)
+      return true
+    } catch {
+      setError('OAuth 回传地址无效，请重新发起连接。')
+      return true
+    }
   }, [])
 
   useEffect(() => {
