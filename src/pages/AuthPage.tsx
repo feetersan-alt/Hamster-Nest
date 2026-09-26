@@ -63,7 +63,7 @@ const AuthPage = ({ user }: AuthPageProps) => {
       email: trimmed,
       options: {
         shouldCreateUser: false,
-        emailRedirectTo: window.location.href,
+        emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`,
       },
     })
     setSending(false)
