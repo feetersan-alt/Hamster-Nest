@@ -61,7 +61,10 @@ const AuthPage = ({ user }: AuthPageProps) => {
     setStatus(null)
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email: trimmed,
-      options: { shouldCreateUser: false },
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: window.location.href,
+      },
     })
     setSending(false)
     if (signInError) {
