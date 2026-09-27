@@ -15,7 +15,8 @@ if (noFxEnabled) {
   document.documentElement.classList.add('no-fx')
 }
 
-const isOAuthConsentPath = window.location.pathname.endsWith('/oauth/consent')
+const normalizedPathname = window.location.pathname.replace(/\/+$/, '')
+const isOAuthConsentPath = normalizedPathname.endsWith('/oauth/consent')
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
