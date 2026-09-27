@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Netlify serves the app from the domain root; GitHub Pages no longer uses /Hamster-Nest/.
-export default defineConfig({
-  base: '/',
+// GitHub Pages serves the production app from /Hamster-Nest/.
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/Hamster-Nest/' : '/',
   plugins: [react()],
-})
+}))
