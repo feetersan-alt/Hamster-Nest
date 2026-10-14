@@ -59,6 +59,7 @@ import ExportPage from './pages/ExportPage'
 import RpRoomsPage from './pages/RpRoomsPage'
 import RpRoomPage from './pages/RpRoomPage'
 import HomePage from './pages/HomePage'
+import OverviewPage from './pages/OverviewPage'
 import HomeLayoutSettingsPage from './pages/HomeLayoutSettingsPage'
 import ForumPage from './pages/ForumPage'
 import ForumNewThreadPage from './pages/ForumNewThreadPage'
@@ -2401,6 +2402,7 @@ const App = () => {
             </RequireAuth>
           }
         />
+        <Route path="/overview" element={<OverviewPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {letterToast ? (
