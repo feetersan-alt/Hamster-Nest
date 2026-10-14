@@ -64,7 +64,7 @@ const DEFAULT_ICON_ORDER = [
   "settings",
   "export",
 ];
-const DEFAULT_PAGE2_ICON_ORDER = ["overview", "forum", "letters", "memo", "timeline", "todo", "knowledge", "wiki", "novels", "council", "lounge", "hamster-wallet", "hamster-console"];
+const DEFAULT_PAGE2_ICON_ORDER = ["overview", "memory-relay", "forum", "letters", "memo", "timeline", "todo", "knowledge", "wiki", "novels", "council", "lounge", "hamster-wallet", "hamster-console"];
 const DEFAULT_PAGE3_ICON_ORDER = ["syzygy-feed", "archive", "events", "diary", "stash"];
 const PAGE_IDS: HomeLayoutPageId[] = ["page1", "page2", "page3"];
 const CORE_WIDGET_ID = "widget-checkin";
@@ -277,6 +277,7 @@ const HomePage = ({ user, onOpenChat, hasUnreadLetters = false, mode = "default"
       { id: "forum", defaultEmoji: "💭", label: "Forum", route: "/forum" },
       { id: "letters", defaultEmoji: "💌", label: "Letters", route: "/letters" },
       { id: "overview", defaultEmoji: "🏡", label: "生活总览", route: "/overview" },
+      { id: "memory-relay", defaultEmoji: "🧠", label: "记忆接力", route: "/memory-relay" },
       { id: "memo", defaultEmoji: "📝", label: "备忘录", route: "/memo" },
       { id: "timeline", defaultEmoji: "🗓️", label: "时间轴", route: "/timeline" },
       { id: "todo", defaultEmoji: "🌷", label: "To do", route: "/todo" },
