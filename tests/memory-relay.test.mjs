@@ -27,3 +27,9 @@ test('relay route is authenticated and linked from home', () => {
   assert.match(app, /path="\/memory-relay"[\s\S]*?<RequireAuth ready=\{authReady\} user=\{user\}>[\s\S]*?<MemoryRelayPage \/>/)
   assert.match(home, /id: "memory-relay"[\s\S]*?route: "\/memory-relay"/)
 })
+
+test('clipboard failure leaves the manual-copy textarea available', () => {
+  assert.match(page, /setCopyError\('复制失败，请手动选择下方交接摘要文本'\)/)
+  assert.match(page, /\{copyError && <p role="alert">\{copyError\}<\/p>\}[\s\S]*?<textarea aria-label="跨窗口交接摘要" readOnly value=\{handoff\}/)
+  assert.doesNotMatch(page, /catch \{\s*setError\('复制失败/)
+})
