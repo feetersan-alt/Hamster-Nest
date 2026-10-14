@@ -60,6 +60,7 @@ import RpRoomsPage from './pages/RpRoomsPage'
 import RpRoomPage from './pages/RpRoomPage'
 import HomePage from './pages/HomePage'
 import OverviewPage from './pages/OverviewPage'
+import MemoryRelayPage from './pages/MemoryRelayPage'
 import HomeLayoutSettingsPage from './pages/HomeLayoutSettingsPage'
 import ForumPage from './pages/ForumPage'
 import ForumNewThreadPage from './pages/ForumNewThreadPage'
@@ -2399,6 +2400,14 @@ const App = () => {
               <Suspense fallback={null}>
                 <KnowledgeLibraryPage />
               </Suspense>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/memory-relay"
+          element={
+            <RequireAuth ready={authReady} user={user}>
+              <MemoryRelayPage />
             </RequireAuth>
           }
         />
