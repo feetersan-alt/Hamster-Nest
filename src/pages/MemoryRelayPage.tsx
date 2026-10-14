@@ -11,11 +11,13 @@ const MemoryRelayPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     setLoading(true)
     setError(null)
     setCopied(false)
+    setCopyError(null)
     try {
       const [threads, memos, memories] = await Promise.all([
         listEventThreads(),
@@ -41,8 +43,9 @@ const MemoryRelayPage = () => {
     try {
       await navigator.clipboard.writeText(handoff)
       setCopied(true)
+      setCopyError(null)
     } catch {
-      setError('复制失败，请手动选择交接摘要文本')
+      setCopyError('复制失败，请手动选择下方交接摘要文本')
     }
   }
 
@@ -61,6 +64,7 @@ const MemoryRelayPage = () => {
           <section className="relay-panel">
             <div className="relay-panel-header"><h2>交接摘要</h2><button type="button" onClick={() => void copyHandoff()} disabled={!handoff}>{copied ? '已复制' : '复制交接摘要'}</button></div>
             <p className="relay-hint">复制后可粘贴到新聊天窗口。此功能不会自动向其他聊天注入内容，也不会上传聊天记录。</p>
+            {copyError && <p role="alert">{copyError}</p>}
             <textarea aria-label="跨窗口交接摘要" readOnly value={handoff} rows={10} />
           </section>
           <section className="relay-panel">
