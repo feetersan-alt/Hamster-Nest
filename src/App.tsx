@@ -2402,7 +2402,14 @@ const App = () => {
             </RequireAuth>
           }
         />
-        <Route path="/overview" element={<OverviewPage />} />
+        <Route
+          path="/overview"
+          element={
+            <RequireAuth ready={authReady} user={user}>
+              <OverviewPage />
+            </RequireAuth>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {letterToast ? (
