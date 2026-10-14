@@ -5,8 +5,9 @@ import test from 'node:test'
 const authPage = readFileSync(new URL('../src/pages/AuthPage.tsx', import.meta.url), 'utf8')
 const authErrors = readFileSync(new URL('../src/lib/authErrors.ts', import.meta.url), 'utf8')
 
-test('single-tenant OTP login never attempts to create users', () => {
-  assert.match(authPage, /signInWithOtp\(\{[\s\S]*shouldCreateUser:\s*false/)
+test('single-tenant password login does not initiate user signup', () => {
+  assert.match(authPage, /auth\.signInWithPassword\(\{/)
+  assert.doesNotMatch(authPage, /auth\.(signUp|signInWithOtp)\(/)
 })
 
 test('web sign-out only clears the current browser session', () => {

@@ -15,7 +15,7 @@ const AuthPage = ({ user }: AuthPageProps) => {
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [signingIn, setSigningIn] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(() => Boolean(supabase))
   const sessionReadyRef = useRef(false)
   const navigate = useNavigate()
 
@@ -49,7 +49,6 @@ const AuthPage = ({ user }: AuthPageProps) => {
     const client = supabase
     if (!client) {
       sessionReadyRef.current = true
-      setIsLoading(false)
       return
     }
 
