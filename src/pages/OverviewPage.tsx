@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { EventThread, MemoEntry, TimelineEntry, TodoDashboardData } from '../types'
+import type { EventThread, MemoEntry, TimelineEntry } from '../types'
 import {
   listTodoDashboard,
   listMemoEntries,
