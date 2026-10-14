@@ -49,7 +49,7 @@ export const buildMemoryRelay = (
       label: '已确认记忆',
       updatedAt: item.updatedAt,
       content: snippet(item.content),
-      href: '/memories',
+      href: '/memory-vault',
     }))
   const sources = [...events, ...notes, ...confirmed]
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
