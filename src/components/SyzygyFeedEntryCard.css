@@ -151,3 +151,45 @@
   color: #a48798;
   padding: 4px 2px;
 }
+
+
+/* ── Moonlit Chinese courtyard theme ── */
+.syzygy-feed-entry {
+  border: 1px solid rgba(112, 137, 105, .56);
+  border-radius: 18px;
+  color: #35483d;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(196, 213, 184, .48), transparent 42%),
+    linear-gradient(180deg, rgba(255, 253, 244, .98) 0%, rgba(234, 239, 225, .98) 100%);
+  box-shadow: 0 9px 22px rgba(48, 73, 53, .11);
+}
+.syzygy-feed-entry:hover { box-shadow: 0 12px 26px rgba(48, 73, 53, .16); }
+.syzygy-feed-entry__glow {
+  background-image: radial-gradient(circle at 1px 1px, rgba(153, 173, 139, .55) 1px, transparent 1px);
+  opacity: .2;
+}
+.syzygy-feed-entry__emoji {
+  border-radius: 13px;
+  color: #365845;
+  background: linear-gradient(180deg, #f7f6e9 0%, #e2ead8 100%);
+  border-color: #c7d4bc;
+}
+.syzygy-feed-entry__heading strong { color: #294b3c; }
+.syzygy-feed-entry__heading p,
+.syzygy-feed-entry__hint { color: #758571; }
+.syzygy-feed-entry__badge {
+  color: #fffaf0;
+  background: linear-gradient(180deg, #a85e45 0%, #8f4937 100%);
+  box-shadow: 0 2px 6px rgba(143, 73, 55, .25);
+}
+.syzygy-feed-entry__stat {
+  background: rgba(255, 253, 244, .84);
+  border-color: rgba(171, 190, 158, .72);
+}
+.syzygy-feed-entry__stat em { color: #355744; }
+.syzygy-feed-entry__stat small { color: #7b8977; }
+.syzygy-feed-entry__stat.is-high {
+  background: linear-gradient(180deg, #f8e8dc 0%, #efd6c4 100%);
+  border-color: #d4a78b;
+}
+.syzygy-feed-entry__stat.is-high em { color: #8f4937; }
