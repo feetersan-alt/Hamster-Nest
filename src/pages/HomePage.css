@@ -650,3 +650,78 @@
     height: calc(100dvh - 4rem);
   }
 }
+
+
+/* ── Moonlit Chinese courtyard home redesign ── */
+.home-page {
+  --icon-tile-bg: rgba(247, 242, 224, .94);
+  --page-overlay-bg: rgba(238, 231, 209, .28);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(198, 180, 135, .18), transparent 42%),
+    var(--page-bg);
+}
+.home-page .phone-shell {
+  border: 1px solid rgba(166, 145, 101, .52);
+  border-radius: 30px;
+  background: #f4efdf;
+  box-shadow: 0 24px 64px rgba(43, 59, 45, .16), inset 0 0 0 5px rgba(255,255,255,.42);
+}
+.home-page .phone-shell__mask {
+  background:
+    linear-gradient(180deg, rgba(247,242,224,.16), rgba(247,242,224,.04)),
+    repeating-linear-gradient(90deg, transparent 0 47px, rgba(125,112,78,.035) 48px 49px);
+}
+.home-page .phone-shell__content { background: transparent; }
+.home-page .home-header {
+  padding: 1.1rem 1rem .85rem;
+  border-bottom: 1px solid rgba(143, 127, 87, .24);
+}
+.home-page .home-page__header,
+.home-page .home-header { color: #293e35; }
+.home-page .home-dock {
+  gap: 1.05rem .7rem;
+  padding: 1.1rem .9rem 1.5rem;
+}
+.home-page .app-icon-slot { min-width: 0; }
+.home-page .app-icon-button {
+  gap: .42rem;
+  color: #2e4438;
+}
+.home-page .icon-emoji {
+  width: 3.45rem;
+  height: 3.45rem;
+  display: grid;
+  place-items: center;
+  border-radius: 18px 18px 15px 15px;
+  border: 1px solid rgba(160, 139, 92, .5);
+  background:
+    linear-gradient(145deg, rgba(255,253,242,.98), rgba(227,224,199,.96));
+  box-shadow: 0 5px 11px rgba(55, 66, 44, .10), inset 0 1px rgba(255,255,255,.92);
+  font-size: 1.65rem;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.home-page .app-icon-button:hover .icon-emoji,
+.home-page .app-icon-button:focus-visible .icon-emoji {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(55, 66, 44, .16), inset 0 1px rgba(255,255,255,.92);
+}
+.home-page .icon-label {
+  color: #3d5143;
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  font-size: .78rem;
+  letter-spacing: .04em;
+}
+.home-page .home-widget-stage,
+.home-page .widget-grid { gap: .8rem; }
+.home-page .widget-card {
+  border: 1px solid rgba(160, 139, 92, .34);
+  border-radius: 18px;
+  background: rgba(250, 247, 234, .84);
+  box-shadow: 0 7px 18px rgba(51, 65, 46, .07);
+}
+@media (max-width: 560px) {
+  .home-page { padding: .5rem; }
+  .home-page .phone-shell { border-radius: 24px; }
+  .home-page .home-dock { gap: .9rem .45rem; padding: .9rem .65rem 1.2rem; }
+  .home-page .icon-emoji { width: 3.1rem; height: 3.1rem; border-radius: 16px; }
+}
