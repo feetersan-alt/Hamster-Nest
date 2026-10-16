@@ -240,3 +240,29 @@ html.no-fx .overview-card, html.no-fx .relay-panel {
   }
   .chat-page .message.out .bubble { background: #d6e6fa; }
 }
+
+/* Accessibility and low-effects overrides must win over mobile media rules. */
+html.no-fx .app-shell .home-page .glass-card,
+html.no-fx .app-shell .overview-page .overview-card,
+html.no-fx .app-shell .relay-page .relay-panel,
+html.no-fx .chat-page .message .bubble,
+html.no-fx .chat-page--ios .app-shell__header {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .app-shell .home-page .glass-card,
+  .app-shell .overview-page .overview-card,
+  .app-shell .relay-page .relay-panel,
+  .chat-page .message .bubble,
+  .chat-page--ios .app-shell__header {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *, .app-shell *::before, .app-shell *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
