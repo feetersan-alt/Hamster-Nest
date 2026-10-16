@@ -1,0 +1,9 @@
+# Dedicated Netlify preview. GitHub Pages keeps its existing /Hamster-Nest/ base.
+[build]
+  command = "npm run build -- --mode netlify"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
