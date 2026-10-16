@@ -279,8 +279,8 @@
 }
 
 .message-tts-button:hover:not(:disabled) {
-  background: #fff7fb;
-  border-color: #f9a8d4;
+  background: #f2f7ff;
+  border-color: #a9c3ec;
   color: #ec4899;
   transform: translateY(-1px);
 }
@@ -291,10 +291,10 @@
 }
 
 .message-tts-button--playing {
-  background: #ffe4f1;
-  border-color: #f9a8d4;
+  background: #dfebff;
+  border-color: #a9c3ec;
   color: #db2777;
-  box-shadow: 0 0 0 3px rgba(249, 168, 212, 0.2);
+  box-shadow: 0 0 0 3px rgba(139, 173, 223, 0.2);
   animation: message-tts-pulse 1.4s ease-in-out infinite;
 }
 
@@ -316,11 +316,11 @@
 @keyframes message-tts-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 3px rgba(249, 168, 212, 0.16);
+    box-shadow: 0 0 0 3px rgba(139, 173, 223, 0.16);
   }
 
   50% {
-    box-shadow: 0 0 0 6px rgba(249, 168, 212, 0.28);
+    box-shadow: 0 0 0 6px rgba(139, 173, 223, 0.28);
   }
 }
 
@@ -416,8 +416,8 @@
 }
 
 .message.out .model-tag {
-  color: #fbcfe8;
-  background: rgba(251, 207, 232, 0.2);
+  color: #c9ddfa;
+  background: rgba(201, 221, 250, 0.2);
 }
 
 .message-actions {
@@ -710,7 +710,7 @@
   font-weight: 700;
   line-height: 16px;
   text-align: center;
-  box-shadow: 0 1px 4px rgba(249, 168, 212, 0.4);
+  box-shadow: 0 1px 4px rgba(139, 173, 223, 0.4);
 }
 
 .injection-menu {
