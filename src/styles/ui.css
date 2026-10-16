@@ -5,18 +5,18 @@
   --font-rounded: 'Nunito', 'Quicksand', 'Comfortaa', 'Avenir Next Rounded', 'Arial Rounded MT Bold', var(--font-sans);
   --font-display: 'Rounded Mplus 1c', 'Nunito', system-ui, -apple-system, 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  --accent: #ffd6e7;
-  --accent-strong: #f8bad4;
-  --text-main: #111827;
-  --text-subtle: #6b7280;
-  --glass-bg: rgba(255, 255, 255, 0.22);
-  --glass-border: rgba(255, 255, 255, 0.35);
-  --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.08);
+  --accent: #b8d5f2;
+  --accent-strong: #91bce6;
+  --text-main: #202d45;
+  --text-subtle: #687a98;
+  --glass-bg: rgba(235, 244, 255, 0.34);
+  --glass-border: rgba(255, 255, 255, 0.62);
+  --shadow-soft: 0 16px 38px rgba(34, 56, 96, 0.13);
   --radius-card: 28px;
   --radius-tile: 20px;
   --radius-btn: 16px;
-  --blur: 16px;
-  --page-bg: linear-gradient(180deg, #fdf2f8 0%, #f8fafc 52%, #f3f4f6 100%);
+  --blur: 24px;
+  --page-bg: radial-gradient(ellipse at 14% 8%, rgba(178, 205, 244, 0.72) 0%, transparent 38%), radial-gradient(ellipse at 88% 18%, rgba(205, 194, 242, 0.68) 0%, transparent 36%), linear-gradient(145deg, #e8f1ff 0%, #dbe5f8 44%, #ece9fa 100%);
 }
 
 .ui-title {
@@ -69,7 +69,7 @@
 .btn-primary {
   background: var(--accent);
   color: var(--text-main);
-  box-shadow: 0 6px 14px rgba(249, 168, 212, 0.34);
+  box-shadow: 0 6px 14px rgba(120, 159, 210, 0.24);
 }
 
 .btn-primary:hover {
@@ -107,7 +107,7 @@
 .input-glass:focus,
 .textarea-glass:focus {
   border-color: color-mix(in srgb, var(--accent) 62%, #fda4af 38%);
-  box-shadow: 0 0 0 3px rgba(255, 214, 231, 0.36);
+  box-shadow: 0 0 0 3px rgba(142, 184, 231, 0.24);
 }
 
 .top-nav {
