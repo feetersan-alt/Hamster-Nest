@@ -1,0 +1,209 @@
+/* Moonlight Glasshouse — translucent liquid-glass theme.
+   Keep effects decorative: content contrast and touch targets remain readable. */
+:root {
+  color-scheme: light;
+  --accent: #b8d5f2;
+  --accent-strong: #8db8e5;
+  --text-main: #202d45;
+  --text-subtle: #687a98;
+  --glass-bg: rgba(239, 246, 255, 0.38);
+  --glass-border: rgba(255, 255, 255, 0.68);
+  --shadow-soft: 0 16px 38px rgba(34, 56, 96, 0.13);
+  --blur: 24px;
+  --page-bg:
+    radial-gradient(ellipse at 12% 8%, rgba(171, 204, 247, .74) 0%, transparent 38%),
+    radial-gradient(ellipse at 88% 18%, rgba(207, 196, 244, .70) 0%, transparent 36%),
+    radial-gradient(ellipse at 48% 100%, rgba(217, 231, 255, .82) 0%, transparent 44%),
+    linear-gradient(145deg, #e8f1ff 0%, #dbe5f8 44%, #ece9fa 100%);
+}
+
+body {
+  background-attachment: fixed;
+}
+
+button, input, textarea, select {
+  accent-color: #789fd2;
+}
+
+.glass-card, .glass-panel, .top-nav, .app-shell__header {
+  border-color: rgba(255,255,255,.64);
+  background-color: rgba(238,246,255,.34);
+  box-shadow: 0 12px 34px rgba(42,63,105,.10), inset 0 1px 0 rgba(255,255,255,.82);
+  -webkit-backdrop-filter: blur(24px) saturate(1.45);
+  backdrop-filter: blur(24px) saturate(1.45);
+}
+
+.glass-card, .glass-panel {
+  position: relative;
+  overflow: hidden;
+}
+.glass-card::before, .glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 42%;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,0));
+  opacity: .75;
+}
+.glass-card > *, .glass-panel > * { position: relative; }
+
+.btn-primary {
+  color: #21314c;
+  background: linear-gradient(135deg, rgba(218,237,255,.96), rgba(177,207,243,.84));
+  border: 1px solid rgba(255,255,255,.78);
+  box-shadow: 0 7px 18px rgba(87,125,180,.20), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.btn-primary:hover { background: linear-gradient(135deg, #eaf5ff, #c1dcfa); }
+.btn-primary:active { background: #a9c9ec; }
+.btn-secondary {
+  background: rgba(245,249,255,.56);
+  border-color: rgba(255,255,255,.72);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+}
+.input-glass, .textarea-glass {
+  background: rgba(248,251,255,.62);
+  border-color: rgba(255,255,255,.76);
+  box-shadow: inset 0 1px 3px rgba(45,66,106,.05);
+}
+.input-glass:focus, .textarea-glass:focus {
+  border-color: rgba(115,157,213,.82);
+  box-shadow: 0 0 0 3px rgba(142,184,231,.22), inset 0 1px 2px rgba(45,66,106,.04);
+}
+.app-shell__header, .top-nav {
+  box-shadow: 0 8px 24px rgba(40,61,101,.07);
+}
+
+/* Chat bubbles: soft liquid glass, with a different tint for each speaker. */
+.chat-page .message .bubble {
+  position: relative;
+  overflow: hidden;
+  border-radius: 25px 25px 25px 9px;
+  border: 1px solid rgba(255,255,255,.82);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.78), rgba(230,241,255,.48)),
+    rgba(240,247,255,.52);
+  color: #253650;
+  box-shadow:
+    0 9px 24px rgba(55,77,118,.10),
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -1px 0 rgba(255,255,255,.26);
+  -webkit-backdrop-filter: blur(26px) saturate(1.55);
+  backdrop-filter: blur(26px) saturate(1.55);
+}
+.chat-page .message .bubble::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 45%;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,0));
+}
+.chat-page .message .bubble > * { position: relative; }
+.chat-page .message.out .bubble {
+  border-radius: 25px 25px 9px 25px;
+  color: #203550;
+  border: 1px solid rgba(255,255,255,.76);
+  background:
+    linear-gradient(135deg, rgba(213,233,255,.82), rgba(185,207,243,.60)),
+    rgba(190,216,247,.68);
+  box-shadow:
+    0 9px 25px rgba(79,111,166,.16),
+    inset 0 1px 0 rgba(255,255,255,.94),
+    inset 0 -1px 0 rgba(255,255,255,.32);
+}
+.chat-page .message.out .bubble a { color: #244e7c; }
+.chat-page .assistant-markdown { color: #253650; }
+.chat-page .assistant-markdown a { color: #315f9b; }
+.chat-page .assistant-markdown code { background: rgba(107,143,194,.13); }
+.chat-page .assistant-markdown pre {
+  background: rgba(30,45,70,.94);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+.chat-page--ios .app-shell__header {
+  background: rgba(222,235,252,.50) !important;
+  border-bottom-color: rgba(255,255,255,.62);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  backdrop-filter: blur(28px) saturate(1.5);
+}
+
+/* Home screen: turn the existing pink glass into moonlit blue-violet glass. */
+.home-page {
+  --icon-tile-bg: rgba(236,245,255,.60);
+  --page-overlay-bg: rgba(210,226,249,.22);
+}
+.home-page .glass-card {
+  border-color: rgba(255,255,255,.72);
+  background: linear-gradient(145deg, rgba(245,249,255,.62), rgba(211,226,249,.35));
+  box-shadow: 0 10px 28px rgba(51,74,119,.11), inset 0 1px 0 rgba(255,255,255,.88);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+}
+.home-page .home-mode-toggle,
+.home-page .home-page-switch {
+  background: rgba(235,244,255,.44);
+  border-color: rgba(255,255,255,.72);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+}
+.home-page .home-mode-toggle button.active,
+.home-page .home-page-switch button.active {
+  color: #21314c;
+  background: linear-gradient(135deg, rgba(220,237,255,.96), rgba(178,205,241,.88));
+  box-shadow: 0 3px 10px rgba(70,100,150,.13), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.home-page .home-header h1 { color: #263754; text-shadow: 0 2px 18px rgba(255,255,255,.5); }
+.home-page .home-header p, .home-page .home-notice { color: #4f6281; }
+.home-page .home-page-switch button,
+.home-page .home-mode-toggle button { color: #405473; }
+.home-page .checkin-streak-hero strong { color: #6f98cc; }
+
+/* Overview and memory relay surfaces share the same translucent material. */
+.overview-page, .relay-page { color: #253650; }
+.overview-card, .relay-panel {
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(247,250,255,.62), rgba(216,230,250,.38));
+  box-shadow: 0 12px 28px rgba(50,72,115,.10), inset 0 1px 0 rgba(255,255,255,.84);
+  -webkit-backdrop-filter: blur(24px) saturate(1.45);
+  backdrop-filter: blur(24px) saturate(1.45);
+}
+.relay-panel textarea {
+  background: rgba(248,251,255,.58);
+  border-color: rgba(255,255,255,.84);
+  box-shadow: inset 0 1px 4px rgba(46,66,105,.06);
+}
+.relay-page button, .overview-page button {
+  border-radius: 12px;
+}
+.relay-page .relay-panel-header button {
+  padding: 9px 13px;
+  border: 1px solid rgba(255,255,255,.78);
+  background: linear-gradient(135deg, rgba(226,239,255,.92), rgba(191,214,246,.78));
+  color: #263a59;
+  box-shadow: 0 4px 12px rgba(63,95,148,.12), inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* Respect reduced-motion and low-effects mode. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+html.no-fx .glass-card, html.no-fx .glass-panel,
+html.no-fx .chat-page .message .bubble,
+html.no-fx .overview-card, html.no-fx .relay-panel {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .chat-page .message .bubble, .overview-card, .relay-panel, .home-page .glass-card {
+    background: rgba(241,247,255,.94);
+  }
+}
+@media (max-width: 560px) {
+  .chat-page .message .bubble {
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    backdrop-filter: blur(18px) saturate(1.3);
+  }
+}
