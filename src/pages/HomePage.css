@@ -108,7 +108,7 @@
 }
 
 .home-mode-toggle button.active {
-  background: #ffd6e7;
+  background: #c7d9f4;
   color: #0f172a;
 }
 
@@ -168,16 +168,16 @@
 }
 
 .home-page-switch button.active {
-  background: #ffd6e7;
+  background: #c7d9f4;
   color: #0f172a;
 }
 
 .home-page .glass-card {
   border-radius: 24px;
-  border: 1px solid rgba(255, 214, 231, 0.78);
+  border: 1px solid rgba(164, 190, 231, 0.78);
   background: rgba(255, 255, 255, 0.45);
   box-shadow:
-    0 8px 24px rgba(255, 214, 231, 0.18),
+    0 8px 24px rgba(164, 190, 231, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.52);
   backdrop-filter: blur(20px);
 }
@@ -353,7 +353,7 @@
 .checkin-streak-hero strong {
   font-size: 2rem;
   line-height: 0.95;
-  color: #ffd6e7;
+  color: #c7d9f4;
   font-family: var(--font-rounded);
 }
 
@@ -381,25 +381,25 @@
 
 .checkin-stamp-button {
   width: 100%;
-  border: 1px solid rgba(255, 214, 231, 0.72);
+  border: 1px solid rgba(164, 190, 231, 0.72);
   border-radius: 999px;
   padding: 0.56rem 0.9rem;
   font-size: 0.83rem;
   font-weight: 800;
   letter-spacing: 0.01em;
   color: #5c5c5c;
-  background: linear-gradient(to right, #fff0f5, #ffd6e7);
-  box-shadow: 0 4px 12px rgba(255, 214, 231, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.52);
+  background: linear-gradient(to right, #f1f6ff, #c7d9f4);
+  box-shadow: 0 4px 12px rgba(164, 190, 231, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.52);
 }
 
 .checkin-stamp-button.unchecked {
-  background: linear-gradient(to right, #fff0f5, #ffd6e7);
+  background: linear-gradient(to right, #f1f6ff, #c7d9f4);
   color: #5c5c5c;
 }
 
 .checkin-stamp-button.checked {
   color: #5c5c5c;
-  background: linear-gradient(to right, #fff4f8, #ffe0eb);
+  background: linear-gradient(to right, #f5f8ff, #dce9fc);
 }
 
 .checkin-stamp-button:disabled {
@@ -438,19 +438,19 @@
 }
 
 .weekly-dot.unchecked {
-  border: 1px dashed #ffd6e7;
+  border: 1px dashed #c7d9f4;
   color: transparent;
   background: transparent;
 }
 
 .weekly-dot.checked {
-  border: 1px solid #ffd6e7;
-  background: #ffd6e7;
+  border: 1px solid #c7d9f4;
+  background: #c7d9f4;
   color: #ffffff;
 }
 
 .weekly-dot.today {
-  box-shadow: 0 0 0 3px rgba(255, 214, 231, 0.24);
+  box-shadow: 0 0 0 3px rgba(164, 190, 231, 0.24);
 }
 
 .widget-upload {
