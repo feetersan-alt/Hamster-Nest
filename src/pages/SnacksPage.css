@@ -567,3 +567,65 @@
   transform: scale(0.97);
   filter: brightness(0.96);
 }
+
+
+/* ── Moonlit Chinese courtyard theme ── */
+.snacks-page:not(.game-feature-page) {
+  color: #35483d;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(210, 224, 205, .52), transparent 48%),
+    linear-gradient(180deg, #f5f1e5 0%, #e9eddf 100%);
+}
+.snacks-page:not(.game-feature-page) .snacks-header h1 { color: #294b3c; letter-spacing: .08em; }
+.snacks-page:not(.game-feature-page) .profile-header-card,
+.snacks-page:not(.game-feature-page) .snacks-composer,
+.snacks-page:not(.game-feature-page) .snacks-feed {
+  border: 1px solid rgba(104, 130, 101, .48);
+  background: linear-gradient(155deg, rgba(255, 253, 244, .97), rgba(231, 237, 222, .96));
+  box-shadow: 0 8px 22px rgba(47, 72, 55, .09), inset 0 0 0 3px rgba(255, 255, 246, .48);
+}
+.snacks-page:not(.game-feature-page) .profile-cover-banner {
+  background-color: #e3e9da;
+  background-image: linear-gradient(135deg, transparent 48%, rgba(104,130,101,.13) 49%, rgba(104,130,101,.13) 51%, transparent 52%);
+  background-size: 24px 24px;
+}
+.snacks-page:not(.game-feature-page) .profile-avatar-surrogate {
+  border-color: #fbf8ed; background: #dce6d4; box-shadow: 0 0 0 1px #81977c;
+}
+.snacks-page:not(.game-feature-page) .profile-title { color: #294b3c; }
+.snacks-page:not(.game-feature-page) .profile-bio { color: #6c7d6b; }
+.snacks-page:not(.game-feature-page) .snacks-composer textarea,
+.snacks-page:not(.game-feature-page) .reply-composer textarea {
+  color: #35483d; background-color: #fbf9f0;
+  border-color: #c6d1bd;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(173, 190, 160, .42) 27px, rgba(173, 190, 160, .42) 28px);
+}
+.snacks-page:not(.game-feature-page) .snacks-composer textarea:focus,
+.snacks-page:not(.game-feature-page) .reply-composer textarea:focus {
+  border-color: #6f8d70; box-shadow: 0 0 0 2px rgba(111,141,112,.16);
+}
+.snacks-page:not(.game-feature-page) .post-card {
+  border: 1px solid #c7d1bd; border-radius: 14px;
+  background: linear-gradient(180deg, #fffdf5 0%, #f4f2e6 100%);
+  box-shadow: 0 5px 14px rgba(43, 68, 50, .07);
+}
+.snacks-page:not(.game-feature-page) .post-card::before { background: rgba(194, 151, 91, .3); }
+.snacks-page:not(.game-feature-page) .post-footer,
+.snacks-page:not(.game-feature-page) .reply-time { color: #7f8d7c; }
+.snacks-page:not(.game-feature-page) .reply-toggle,
+.snacks-page:not(.game-feature-page) .reply-list {
+  background: #f7f6eb; border-color: #d5ddca;
+}
+.snacks-page:not(.game-feature-page) .reply-bubble {
+  background: #fffdf5; border-color: #d5ddca; border-left-color: #789477;
+}
+.snacks-page:not(.game-feature-page) .reply-bubble.user { background: #edf1e6; }
+.snacks-page:not(.game-feature-page) .reply-model-badge {
+  color: #355443; background: #dce7d5;
+}
+.snacks-page:not(.game-feature-page) .reply-toggle-main,
+.snacks-page:not(.game-feature-page) .reply-role { color: #405d49; }
+.snacks-page:not(.game-feature-page) .ghost:hover { color: #9c573f; }
+.snacks-page:not(.game-feature-page) .tts-button:hover:not(:disabled) {
+  background: #edf2e6; border-color: #8da58a; color: #355443;
+}

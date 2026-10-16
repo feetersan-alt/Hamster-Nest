@@ -812,3 +812,63 @@
     flex-basis: 100%;
   }
 }
+
+
+/* ── Moonlit Chinese courtyard theme ── */
+.feed-page { color: #35483d; }
+.feed-page::before {
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(199, 216, 188, .44), transparent 44%),
+    radial-gradient(circle at 94% 10%, rgba(220, 205, 164, .22), transparent 48%),
+    linear-gradient(180deg, rgba(247, 244, 232, .98) 0%, rgba(232, 237, 222, .98) 100%);
+}
+.feed-page__header,
+.feed-hero,
+.feed-overview,
+.feed-calendar {
+  border-color: rgba(112, 137, 105, .48);
+  background: linear-gradient(155deg, rgba(255, 253, 244, .98) 0%, rgba(235, 239, 226, .97) 100%);
+  box-shadow: 0 8px 20px rgba(48, 73, 53, .09), inset 0 0 0 2px rgba(255, 255, 246, .42);
+}
+.feed-page__kicker,
+.feed-overview__month,
+.feed-overview__toggle,
+.feed-calendar__weekdays { color: #7a8a73; }
+.feed-page__header .ui-title,
+.feed-overview__title,
+.feed-calendar__top strong { color: #294b3c; }
+.feed-page__back,
+.feed-page__today,
+.feed-calendar__top .ghost {
+  border-color: #c4d2ba; background: #fbf9ef; color: #365744;
+}
+.feed-page__today {
+  background: linear-gradient(180deg, #e3ead9 0%, #d4e0ca 100%);
+}
+.feed-hero__subtitle,
+.feed-overview__empty { color: #72836d; }
+.feed-hero__stat,
+.feed-overview__empty {
+  background: rgba(255, 253, 244, .84);
+  border-color: rgba(171, 190, 158, .72);
+}
+.feed-hero__stat em,
+.feed-overview__theme-title { color: #355744; }
+.feed-hero__stat small { color: #7b8977; }
+.feed-hero__stat.is-high {
+  background: linear-gradient(180deg, #f8e8dc 0%, #efd6c4 100%);
+  border-color: #d4a78b;
+}
+.feed-hero__stat.is-high em { color: #8f4937; }
+.feed-overview__bullet { background: #819a78; box-shadow: 0 0 0 3px rgba(192, 207, 179, .38); }
+.feed-overview__flag {
+  color: #687a65; background: #eef0e4; border-color: #d2dbc8;
+}
+.feed-calendar__cell {
+  border-color: rgba(171, 190, 158, .55);
+  background: rgba(255, 253, 244, .92); color: #35483d;
+}
+.feed-calendar__cell:hover { background: #eaf0e2; border-color: #93aa88; }
+.feed-alert--soft { border-color: #c8d5bf; color: #657a61; background: rgba(246, 247, 235, .96); }
+.feed-overview__toggle:hover { background: #eaf0e2; color: #355744; }
