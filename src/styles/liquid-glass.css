@@ -207,3 +207,36 @@ html.no-fx .overview-card, html.no-fx .relay-panel {
     backdrop-filter: blur(18px) saturate(1.3);
   }
 }
+
+/* Mobile: keep translucent surfaces legible and avoid expensive stacked blur. */
+@media (max-width: 560px) {
+  .app-shell .home-page .glass-card,
+  .app-shell .overview-page .overview-card,
+  .app-shell .relay-page .relay-panel {
+    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+    backdrop-filter: blur(14px) saturate(1.25);
+    background-color: rgba(239, 246, 255, .76);
+  }
+  .chat-page .message .bubble {
+    background-color: rgba(241, 247, 255, .86);
+    overflow-wrap: anywhere;
+  }
+  .chat-page .message.out .bubble {
+    background-color: rgba(207, 226, 250, .88);
+  }
+  .app-shell .relay-page .relay-panel textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .app-shell .home-page .glass-card,
+  .app-shell .overview-page .overview-card,
+  .app-shell .relay-page .relay-panel,
+  .chat-page .message .bubble {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #f0f6ff;
+  }
+  .chat-page .message.out .bubble { background: #d6e6fa; }
+}
