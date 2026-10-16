@@ -432,3 +432,75 @@ button, input, textarea, select { accent-color: #718b77; }
 @media (prefers-reduced-transparency: reduce) {
   .glass-card, .glass-panel, .chat-page .message .bubble, .app-shell .home-page .glass-card { -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+
+
+/* ── Moonlit Chinese courtyard palette ── */
+:root {
+  color-scheme: light;
+  --accent: #71866a;
+  --accent-strong: #4f6b54;
+  --text-main: #2d3b31;
+  --text-subtle: #73745f;
+  --glass-bg: rgba(248, 244, 229, .9);
+  --glass-border: rgba(163, 145, 104, .42);
+  --shadow-soft: 0 12px 30px rgba(41, 57, 43, .12);
+  --page-bg: #e9e5d2;
+  --surface: #f8f4e5;
+  --surface-raised: #fcf9ed;
+  --border-subtle: rgba(137, 129, 91, .3);
+  --ink-cinnabar: #a64f3c;
+  --antique-gold: #b29a61;
+}
+body {
+  color: var(--text-main);
+  background:
+    radial-gradient(ellipse at 50% -8%, rgba(255, 252, 235, .92), transparent 48%),
+    linear-gradient(135deg, #e7e4d1, #e9e0ce 52%, #dce2d1);
+}
+.app-shell {
+  background: transparent;
+}
+.app-shell .app-shell__header,
+.app-shell .glass-panel,
+.app-shell .glass-card,
+.app-shell .overview-card,
+.app-shell .relay-panel,
+.app-shell .settings-panel {
+  border-color: var(--glass-border);
+  background: rgba(249, 246, 232, .88);
+  box-shadow: var(--shadow-soft);
+}
+button, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+button:not(:disabled):focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #8b9c78;
+  outline-offset: 3px;
+}
+.chat-page .message .bubble {
+  border: 1px solid rgba(165, 148, 105, .28);
+  border-radius: 18px 18px 18px 5px;
+  background: #fbf7e9;
+  color: #2d3b31;
+  box-shadow: 0 4px 12px rgba(44, 55, 39, .06);
+}
+.chat-page .message.out .bubble {
+  border-color: rgba(110, 137, 103, .3);
+  border-radius: 18px 18px 5px 18px;
+  background: #e0e8d7;
+  color: #2d4336;
+}
+.chat-page input, .chat-page textarea, .chat-page select,
+.app-shell input, .app-shell textarea, .app-shell select {
+  border-color: rgba(143, 132, 94, .4);
+  background: rgba(255, 252, 241, .9);
+  color: #2d3b31;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .app-shell .app-shell__header, .app-shell .glass-panel, .app-shell .glass-card,
+  .app-shell .overview-card, .app-shell .relay-panel, .chat-page .message .bubble {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
