@@ -106,43 +106,40 @@ const StarIslandPage = ({ user }: StarIslandPageProps) => {
   }, [user])
 
   const act = useCallback((kind: 'feed' | 'pet' | 'play' | 'stay') => {
-    setPet(current => {
-      let next: PetState
-      let line = ''
-      if (kind === 'feed') {
-        if (current.star_candy <= 0) {
-          setMessage('星星糖吃完啦。先陪星团探索花园，找找新的星尘吧。')
-          return current
-        }
-        next = { ...current, star_candy: current.star_candy - 1, hunger: clamp(current.hunger + 22), joy: clamp(current.joy + 7), bond: clamp(current.bond + 2), experience: current.experience + 8 }
-        line = '星团抱住星星糖，星核亮了一小会儿。'
-      } else if (kind === 'pet') {
-        next = { ...current, joy: clamp(current.joy + 10), bond: clamp(current.bond + 4), experience: current.experience + 5 }
-        line = '你轻轻摸了摸云团，星团舒服得眯起眼睛。'
-      } else if (kind === 'play') {
-        next = { ...current, hunger: clamp(current.hunger - 8), joy: clamp(current.joy + 16), bond: clamp(current.bond + 3), stardust: current.stardust + 1, experience: current.experience + 12 }
-        line = '星团追着萤光绕了花园一圈，捡到 1 点星尘。'
-      } else {
-        next = { ...current, joy: clamp(current.joy + 5), bond: clamp(current.bond + 5), experience: current.experience + 6 }
-        line = '你们一起看了一会儿月亮。没有任务，只是待在一起。'
+    let next: PetState
+    let line = ''
+    if (kind === 'feed') {
+      if (pet.star_candy <= 0) {
+        setMessage('星星糖吃完啦。先陪星团探索花园，找找新的星尘吧。')
+        return
       }
-      const leveled = next.experience >= next.level * 30
-      if (leveled) {
-        next = {
-          ...next,
-          experience: next.experience - next.level * 30,
-          level: next.level + 1,
-          growth_stage: next.level + 1 >= 5 ? '蜕变期' : next.level + 1 >= 2 ? '成长期' : '初生期',
-          star_pattern: next.level + 1 >= 2 ? '第一道微光星纹' : next.star_pattern,
-        }
-        line += ' 星核忽然闪亮——星团升级了！'
+      next = { ...pet, star_candy: pet.star_candy - 1, hunger: clamp(pet.hunger + 22), joy: clamp(pet.joy + 7), bond: clamp(pet.bond + 2), experience: pet.experience + 8 }
+      line = '星团抱住星星糖，星核亮了一小会儿。'
+    } else if (kind === 'pet') {
+      next = { ...pet, joy: clamp(pet.joy + 10), bond: clamp(pet.bond + 4), experience: pet.experience + 5 }
+      line = '你轻轻摸了摸云团，星团舒服得眯起眼睛。'
+    } else if (kind === 'play') {
+      next = { ...pet, hunger: clamp(pet.hunger - 8), joy: clamp(pet.joy + 16), bond: clamp(pet.bond + 3), stardust: pet.stardust + 1, experience: pet.experience + 12 }
+      line = '星团追着萤光绕了花园一圈，捡到 1 点星尘。'
+    } else {
+      next = { ...pet, joy: clamp(pet.joy + 5), bond: clamp(pet.bond + 5), experience: pet.experience + 6 }
+      line = '你们一起看了一会儿月亮。没有任务，只是待在一起。'
+    }
+    if (next.experience >= next.level * 30) {
+      next = {
+        ...next,
+        experience: next.experience - next.level * 30,
+        level: next.level + 1,
+        growth_stage: next.level + 1 >= 5 ? '蜕变期' : '成长期',
+        star_pattern: '第一道微光星纹',
       }
-      setMessage(line)
-      setDiary(currentDiary => [line, ...currentDiary].slice(0, 6))
-      void persist(next)
-      return next
-    })
-  }, [persist])
+      line += ' 星核忽然闪亮——星团升级了！'
+    }
+    setPet(next)
+    setMessage(line)
+    setDiary(currentDiary => [line, ...currentDiary].slice(0, 6))
+    void persist(next)
+  }, [pet, persist])
 
   const saveName = () => {
     const name = rename.trim().slice(0, 16)
