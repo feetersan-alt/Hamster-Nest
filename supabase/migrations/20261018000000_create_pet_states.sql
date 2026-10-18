@@ -41,3 +41,6 @@ create policy "Users can delete their own pet states"
   using (auth.uid() = user_id);
 
 create index if not exists pet_states_user_id_idx on public.pet_states(user_id);
+
+-- Explicit Data API privileges for trusted server-side operations.
+grant select, insert, update, delete on table public.pet_states to service_role;
