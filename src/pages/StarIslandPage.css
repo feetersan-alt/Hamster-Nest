@@ -1,0 +1,102 @@
+.star-island {
+  --si-ink: #293a55;
+  --si-muted: #6d7e9d;
+  min-height: 100vh;
+  padding: clamp(18px, 4vw, 48px);
+  position: relative;
+  overflow: hidden;
+  color: var(--si-ink);
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(178, 204, 248, .62), transparent 34%),
+    radial-gradient(ellipse at 85% 22%, rgba(203, 190, 246, .55), transparent 35%),
+    radial-gradient(ellipse at 50% 100%, rgba(217, 230, 255, .9), transparent 50%),
+    linear-gradient(145deg, #eaf2ff, #e2e8fa 55%, #f0eafa);
+}
+.star-island__sky { position: absolute; inset: 0; overflow: hidden; pointer-events: none; color: rgba(255,255,255,.95); font-size: 22px; }
+.star-island__sky i { position: absolute; font-style: normal; animation: si-twinkle 4s ease-in-out infinite alternate; }
+.star-island__sky i:nth-child(1) { top: 8%; left: 13%; }
+.star-island__sky i:nth-child(2) { top: 18%; left: 81%; animation-delay: -2s; }
+.star-island__sky i:nth-child(3) { top: 36%; left: 7%; animation-delay: -1s; }
+.star-island__sky i:nth-child(4) { top: 57%; left: 93%; animation-delay: -3s; }
+.star-island__sky i:nth-child(5) { top: 76%; left: 21%; animation-delay: -1.5s; }
+.star-island__sky i:nth-child(6) { top: 68%; left: 68%; }
+.star-island__sky i:nth-child(7) { top: 44%; left: 47%; animation-delay: -2.5s; }
+@keyframes si-twinkle { from { opacity: .35; transform: scale(.8) rotate(-10deg); } to { opacity: 1; transform: scale(1.12) rotate(12deg); } }
+.star-island__header, .star-island__hero, .star-island__lower, .star-island__footer { max-width: 1160px; margin-inline: auto; position: relative; z-index: 1; }
+.star-island__header { display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: start; gap: 18px; margin-bottom: 28px; }
+.star-island__header h1 { font-size: clamp(32px, 4vw, 52px); letter-spacing: .08em; margin: 3px 0 10px; font-weight: 700; }
+.star-island__header p { color: var(--si-muted); margin: 0; line-height: 1.7; }
+.star-island__back { color: #546b90; text-decoration: none; padding-top: 8px; }
+.star-island__eyebrow { color: #8795b7 !important; font-size: 10px; letter-spacing: .18em; font-weight: 800; margin: 0 0 8px !important; }
+.star-island__save { justify-self: end; border: 1px solid rgba(255,255,255,.8); border-radius: 999px; padding: 8px 13px; color: #627a9e; background: rgba(255,255,255,.36); font-size: 12px; backdrop-filter: blur(18px); }
+.star-island .glass-panel { border: 1px solid rgba(255,255,255,.75); background: linear-gradient(145deg, rgba(255,255,255,.58), rgba(218,230,252,.38)); border-radius: 28px; box-shadow: 0 20px 48px rgba(65,83,129,.10), inset 0 1px 0 rgba(255,255,255,.95); backdrop-filter: blur(24px) saturate(1.35); -webkit-backdrop-filter: blur(24px) saturate(1.35); }
+.star-island__hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 48px); padding: clamp(18px, 3vw, 34px); }
+.star-island__scene { min-height: 330px; position: relative; overflow: hidden; border-radius: 23px; background: radial-gradient(ellipse at 50% 70%, rgba(255,255,255,.9), transparent 42%), linear-gradient(180deg, #b7c9ef 0%, #d4d8f5 48%, #e6e6fa 100%); }
+.star-island__moon { position: absolute; width: 96px; height: 96px; border-radius: 50%; top: 35px; right: 14%; background: radial-gradient(circle at 32% 28%, #fff, #fff8d9 52%, #e3d6fa); box-shadow: 0 0 55px rgba(255,248,220,.72); }
+.star-island__island { position: absolute; width: 115%; height: 130px; left: -8%; bottom: -30px; border-radius: 50% 50% 0 0; background: linear-gradient(180deg, #a7c2c2, #7c9f9e); box-shadow: inset 0 12px 25px rgba(255,255,255,.45); transform: rotate(-3deg); }
+.star-island__pet { position: absolute; left: 50%; top: 48%; transform: translate(-50%,-50%); width: 178px; height: 148px; border-radius: 48% 52% 45% 49%; background: radial-gradient(circle at 32% 22%, #fff, #f5f5ff 35%, #c9d6f5 100%); box-shadow: 0 18px 35px rgba(91,108,167,.23), inset 0 5px 13px white; display: grid; place-items: center; animation: si-float 4s ease-in-out infinite; }
+@keyframes si-float { 0%,100% { transform: translate(-50%,-50%) translateY(0); } 50% { transform: translate(-50%,-50%) translateY(-9px); } }
+.star-island__pet-glow { position: absolute; top: 13px; left: 50%; width: 39px; height: 39px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle, #fffce0, #f5dc91 52%, rgba(244,219,145,.1)); box-shadow: 0 0 25px rgba(255,237,169,.9); }
+.star-island__pet-star { position: absolute; top: 19px; left: calc(50% - 9px); color: #fff; font-size: 17px; text-shadow: 0 0 9px #f7ce66; }
+.star-island__pet-face { position: absolute; top: 62px; display: flex; align-items: center; gap: 23px; color: #647393; }
+.star-island__pet-face i { display: block; width: 7px; height: 10px; background: #596985; border-radius: 50%; }
+.star-island__pet-face b { position: absolute; top: 14px; left: 13px; width: 23px; font-size: 18px; font-weight: 500; }
+.star-island__pet-name { position: absolute; bottom: -29px; color: white; text-shadow: 0 2px 8px rgba(46,65,106,.4); font-weight: 700; letter-spacing: .08em; }
+.star-island__floating-star { position: absolute; color: white; text-shadow: 0 0 13px #fff; font-size: 25px; }
+.star-island__floating-star.star-a { top: 35%; left: 22%; }
+.star-island__floating-star.star-b { top: 55%; right: 19%; font-size: 16px; }
+.star-island__floating-star.star-c { top: 26%; left: 40%; font-size: 30px; }
+.star-island__pet-info { padding: 8px 6px; display: flex; flex-direction: column; justify-content: center; }
+.star-island__level-row { display: flex; justify-content: space-between; color: #7186a8; font-size: 12px; }
+.star-island__stage { padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.54); border: 1px solid rgba(255,255,255,.9); }
+.star-island__pet-info h2 { font-size: 32px; margin: 16px 0 7px; }
+.star-island__pet-info h2 span { color: #d2b568; font-size: 20px; }
+.star-island__description { color: var(--si-muted); font-size: 14px; line-height: 1.8; margin: 0 0 20px; }
+.star-island__xp > div:first-child { display: flex; justify-content: space-between; color: #7283a0; font-size: 12px; margin-bottom: 9px; }
+.star-island__track { height: 7px; background: rgba(130,151,193,.18); border-radius: 99px; overflow: hidden; }
+.star-island__track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#c3d9f6,#b5a9e6); transition: width .35s; }
+.star-island__stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 13px; margin: 24px 0 18px; }
+.star-island__stats > div { display: grid; grid-template-columns: 1fr auto; gap: 8px; color: #7b8ba6; font-size: 12px; }
+.star-island__stats strong { color: #4c6287; font-size: 12px; }
+.star-island__meter { grid-column: 1 / -1; height: 5px; background: rgba(124,146,190,.18); border-radius: 99px; overflow: hidden; }
+.star-island__meter span { display: block; height: 100%; width: var(--meter-value); background: linear-gradient(90deg,#b6d3f4,#c5b4e8); border-radius: inherit; }
+.star-island__inventory { display: flex; flex-wrap: wrap; gap: 8px; }
+.star-island__inventory span { padding: 7px 10px; border: 1px solid rgba(255,255,255,.76); border-radius: 12px; background: rgba(255,255,255,.34); color: #6e80a0; font-size: 11px; }
+.star-island__inventory b { color: #4e6385; }
+.star-island__lower { display: grid; grid-template-columns: 1.1fr .9fr; gap: 20px; margin-top: 22px; }
+.star-island__panel { padding: clamp(18px, 2.5vw, 28px); min-width: 0; }
+.star-island__panel-heading { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 15px; }
+.star-island__panel-heading h2 { font-size: 21px; margin: 0; }
+.star-island__panel-heading > span { color: #91a0ba; font-size: 11px; white-space: nowrap; }
+.star-island__message { padding: 13px 15px; min-height: 46px; border-radius: 15px; background: rgba(255,255,255,.37); color: #5f7496; font-size: 13px; line-height: 1.7; }
+.star-island__actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.star-island__actions button, .star-island__rename button { border: 1px solid rgba(255,255,255,.88); border-radius: 14px; padding: 12px; color: #465d80; background: linear-gradient(135deg,rgba(255,255,255,.8),rgba(213,229,251,.65)); box-shadow: 0 5px 15px rgba(77,101,151,.08), inset 0 1px 0 white; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.star-island__actions button:hover, .star-island__rename button:hover { transform: translateY(-2px); box-shadow: 0 8px 19px rgba(77,101,151,.13); }
+.star-island__actions button:disabled, .star-island__rename button:disabled { opacity: .55; cursor: wait; transform: none; }
+.star-island__rename { margin-top: 20px; }
+.star-island__rename label { display: block; margin-bottom: 8px; color: #7788a5; font-size: 12px; }
+.star-island__rename > div { display: flex; gap: 8px; }
+.star-island__rename input { min-width: 0; flex: 1; border: 1px solid rgba(255,255,255,.88); border-radius: 12px; background: rgba(255,255,255,.46); padding: 10px 12px; color: #394f72; }
+.star-island__diary { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.star-island__diary li { display: grid; grid-template-columns: 14px 1fr; gap: 8px; color: #6c7e9d; font-size: 13px; line-height: 1.7; }
+.star-island__diary li span { color: #b6a5df; }
+.star-island__note { margin-top: 20px; border-top: 1px solid rgba(255,255,255,.65); padding-top: 14px; color: #8795ae; font-size: 11px; line-height: 1.8; }
+.star-island__footer { padding: 24px 0 8px; text-align: center; color: #91a0b8; font-size: 11px; }
+.star-island__footer span { color: #c5ad70; margin: 0 8px; }
+.star-island__loading { max-width: 500px; margin: 25vh auto; text-align: center; color: #7183a4; }
+@media (max-width: 760px) {
+  .star-island__header { grid-template-columns: 1fr auto; }
+  .star-island__header > div { grid-column: 1 / -1; grid-row: 2; }
+  .star-island__save { grid-column: 2; grid-row: 1; }
+  .star-island__hero, .star-island__lower { grid-template-columns: 1fr; }
+  .star-island__scene { min-height: 300px; }
+  .star-island__stats { gap: 8px; }
+  .star-island__inventory { gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .star-island__sky i, .star-island__pet { animation: none; }
+  .star-island__actions button, .star-island__rename button { transition: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .star-island .glass-panel { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(245,248,255,.96); }
+}
