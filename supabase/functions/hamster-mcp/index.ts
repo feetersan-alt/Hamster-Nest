@@ -1,4 +1,5 @@
 import { z } from 'npm:zod@^4.1.13'
+import { registerLoungeTools, LOUNGE_MCP_INSTRUCTIONS } from './lounge-tools.ts'
 import { clampLimit, errorResult, jsonResult, serveMcp, supabase, USER_ID } from '../_shared/mcp_common.ts'
 
 const FEED_LIST_COLUMNS = 'id, type, title, summary, priority, status, source, created_by, visible_from, created_at, pinned, metadata'
@@ -773,4 +774,6 @@ serveMcp('hamster-mcp', (server) => {
       return errorResult(err)
     }
   })
-}, { instructions: HAMSTER_MCP_INSTRUCTIONS })
+  registerLoungeTools(server)
+
+}, { instructions: [HAMSTER_MCP_INSTRUCTIONS, LOUNGE_MCP_INSTRUCTIONS].join('\n') })
