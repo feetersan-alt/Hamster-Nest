@@ -79,13 +79,6 @@ export function serveMcp(
         headers: { 'Content-Type': 'application/json' },
       })
     }
-    if (!(await isAuthorizedRequest(c.req.raw))) {
-      return new Response(JSON.stringify({ error: 'unauthorized' }), {
-        status: 401,
-        headers: { ...(corsHeaders ?? {}), 'Content-Type': 'application/json' },
-      })
-    }
-
     await next()
 
     if (corsHeaders) {
