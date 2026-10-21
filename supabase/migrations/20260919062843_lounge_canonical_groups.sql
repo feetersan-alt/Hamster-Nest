@@ -1,3 +1,7 @@
+create schema if not exists private;
+create extension if not exists pg_net;
+create extension if not exists pg_cron;
+
 -- Expand the legacy sofa directory; canonical messages are the source of truth.
 alter table public.lounge_sofas add column user_id uuid references auth.users(id),
   add column session_id uuid unique references public.sessions(id),
@@ -675,7 +679,7 @@ declare secret text; begin
  if not exists(select 1 from public.messages where meta->>'api_queue'='pending' or (meta->>'api_queue'='running' and (meta->>'api_started_at')::timestamptz<now()-interval '150 seconds')) then return; end if;
  select decrypted_secret into secret from vault.decrypted_secrets where name='push_dispatch_secret' limit 1;
  if secret is null then raise warning 'lounge worker secret unavailable'; return; end if;
- perform net.http_post(url:='https://crfhiumxzmaszkapanrb.supabase.co/functions/v1/conversation-dispatch',
+ perform net.http_post(url:='https://yuibwaqnhrzghjrwhgfn.supabase.co/functions/v1/conversation-dispatch',
    headers:=jsonb_build_object('Content-Type','application/json','x-lounge-worker-secret',secret),
    body:='{"action":"lounge_worker"}'::jsonb,timeout_milliseconds:=5000);
 exception when others then raise warning 'lounge worker kick unavailable';
