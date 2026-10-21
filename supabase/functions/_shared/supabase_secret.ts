@@ -37,7 +37,12 @@ const readSecretKeys = (): Record<string, string> => {
 }
 
 export const getSupabaseAdminKey = (): string => {
-  const key = readSecretKeys()[ADMIN_SECRET_KEY_NAME]
+  const secretKeys = readSecretKeys()
+  // SUPABASE_SECRET_KEYS is injected by Supabase and keyed by the API key's
+  // dashboard name. Do not try to create this reserved SUPABASE_ variable as
+  // a user secret. Prefer the historical name, then Supabase's default key.
+  const key = secretKeys[ADMIN_SECRET_KEY_NAME] ?? secretKeys.default ??
+    (Object.keys(secretKeys).length === 1 ? Object.values(secretKeys)[0] : undefined)
   if (key?.startsWith('sb_secret_')) return key
 
   // Compatibility fallback for Supabase projects that still expose the legacy
@@ -45,7 +50,7 @@ export const getSupabaseAdminKey = (): string => {
   const legacyServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')?.trim() ?? ''
   if (legacyServiceRoleKey.startsWith('eyJ')) return legacyServiceRoleKey
 
-  throw new Error(`Supabase admin key ${ADMIN_SECRET_KEY_NAME} and legacy SUPABASE_SERVICE_ROLE_KEY are not configured`)
+  throw new Error('No usable Supabase secret key found in injected SUPABASE_SECRET_KEYS (expected named key, default, or a single configured key) and legacy SUPABASE_SERVICE_ROLE_KEY is unavailable')
 }
 
 export const isApprovedSupabaseSecretKey = (candidate: string): boolean => {
