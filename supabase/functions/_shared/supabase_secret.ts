@@ -38,10 +38,14 @@ const readSecretKeys = (): Record<string, string> => {
 
 export const getSupabaseAdminKey = (): string => {
   const key = readSecretKeys()[ADMIN_SECRET_KEY_NAME]
-  if (!key || !key.startsWith('sb_secret_')) {
-    throw new Error(`Supabase secret key ${ADMIN_SECRET_KEY_NAME} is not configured`)
-  }
-  return key
+  if (key?.startsWith('sb_secret_')) return key
+
+  // Compatibility fallback for Supabase projects that still expose the legacy
+  // service-role JWT to Edge Functions but have not populated SUPABASE_SECRET_KEYS.
+  const legacyServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')?.trim() ?? ''
+  if (legacyServiceRoleKey.startsWith('eyJ')) return legacyServiceRoleKey
+
+  throw new Error(`Supabase admin key ${ADMIN_SECRET_KEY_NAME} and legacy SUPABASE_SERVICE_ROLE_KEY are not configured`)
 }
 
 export const isApprovedSupabaseSecretKey = (candidate: string): boolean => {
