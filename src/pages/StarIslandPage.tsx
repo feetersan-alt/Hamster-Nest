@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../supabase/client'
+import { storageKeysFor } from './starIslandStorage'
 import './StarIslandPage.css'
 
 type PetState = {
@@ -19,7 +20,6 @@ type PetState = {
 
 type StarIslandPageProps = { user: User | null }
 
-const STORAGE_KEY = 'moonlight-garden-pet-state-v1'
 const INITIAL_STATE: PetState = {
   pet_id: 'xing-tuan',
   name: '星团',
@@ -35,25 +35,41 @@ const INITIAL_STATE: PetState = {
 }
 
 const clamp = (value: number, min = 0, max = 100) => Math.max(min, Math.min(max, value))
-const loadLocalState = (): PetState => {
+const loadLocalState = (key: string): PetState => {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
+    const raw = window.localStorage.getItem(key)
     return raw ? { ...INITIAL_STATE, ...JSON.parse(raw) } : INITIAL_STATE
   } catch {
     return INITIAL_STATE
   }
 }
 
-const StarIslandPage = ({ user }: StarIslandPageProps) => {
+const FIRST_DIARY_ENTRY = '第一次见面：星团把星星糖吃了一半，另一半紧紧抱在怀里。'
+const loadLocalDiary = (key: string): string[] => {
+  try {
+    const raw = window.localStorage.getItem(key)
+    const entries: unknown = raw ? JSON.parse(raw) : null
+    return Array.isArray(entries) && entries.every(entry => typeof entry === 'string')
+      ? entries.slice(0, 6)
+      : [FIRST_DIARY_ENTRY]
+  } catch {
+    return [FIRST_DIARY_ENTRY]
+  }
+}
+
+const StarIslandSession = ({ user }: StarIslandPageProps) => {
+  const { pet: storageKey, diary: diaryKey } = storageKeysFor(user?.id ?? null)
   const [pet, setPet] = useState<PetState>(INITIAL_STATE)
   const [ready, setReady] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('星团正蜷在星窝里，等你来找它。')
   const [rename, setRename] = useState(INITIAL_STATE.name)
-  const [diary, setDiary] = useState<string[]>(['第一次见面：星团把星星糖吃了一半，另一半紧紧抱在怀里。'])
+  const [diary, setDiary] = useState<string[]>([FIRST_DIARY_ENTRY])
 
   useEffect(() => {
     let cancelled = false
+    setReady(false)
+    setDiary(loadLocalDiary(diaryKey))
     const restore = async () => {
       if (user && supabase) {
         const { data, error } = await supabase
@@ -67,14 +83,14 @@ const StarIslandPage = ({ user }: StarIslandPageProps) => {
           const restored = { ...INITIAL_STATE, ...data } as PetState
           setPet(restored)
           setRename(restored.name)
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(restored))
+          window.localStorage.setItem(storageKey, JSON.stringify(restored))
         } else {
-          const local = loadLocalState()
+          const local = loadLocalState(storageKey)
           setPet(local)
           setRename(local.name)
         }
       } else {
-        const local = loadLocalState()
+        const local = loadLocalState(storageKey)
         setPet(local)
         setRename(local.name)
       }
@@ -82,10 +98,10 @@ const StarIslandPage = ({ user }: StarIslandPageProps) => {
     }
     void restore()
     return () => { cancelled = true }
-  }, [user])
+  }, [user, storageKey, diaryKey])
 
   const persist = useCallback(async (next: PetState) => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+    window.localStorage.setItem(storageKey, JSON.stringify(next))
     if (!user || !supabase) {
       setMessage('已保存在这台设备上；登录并配置云端存档后即可跨设备继续。')
       return
@@ -103,7 +119,7 @@ const StarIslandPage = ({ user }: StarIslandPageProps) => {
     } else {
       setMessage('星团的成长已经保存到云端。')
     }
-  }, [user])
+  }, [user, storageKey])
 
   const act = useCallback((kind: 'feed' | 'pet' | 'play' | 'stay') => {
     let next: PetState
@@ -137,9 +153,13 @@ const StarIslandPage = ({ user }: StarIslandPageProps) => {
     }
     setPet(next)
     setMessage(line)
-    setDiary(currentDiary => [line, ...currentDiary].slice(0, 6))
+    setDiary(currentDiary => {
+      const nextDiary = [line, ...currentDiary].slice(0, 6)
+      try { window.localStorage.setItem(diaryKey, JSON.stringify(nextDiary)) } catch { /* Storage may be disabled. */ }
+      return nextDiary
+    })
     void persist(next)
-  }, [pet, persist])
+  }, [pet, persist, diaryKey])
 
   const saveName = () => {
     const name = rename.trim().slice(0, 16)
@@ -211,5 +231,10 @@ const StarIslandPage = ({ user }: StarIslandPageProps) => {
     </main>
   )
 }
+
+// Remount state when the signed-in account changes; never render the previous account's pet.
+const StarIslandPage = ({ user }: StarIslandPageProps) => (
+  <StarIslandSession key={user?.id ?? 'guest'} user={user} />
+)
 
 export default StarIslandPage
