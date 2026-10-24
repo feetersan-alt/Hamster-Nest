@@ -67,6 +67,10 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
   const [diary, setDiary] = useState<string[]>(() => loadLocalDiary(diaryKey))
 
   useEffect(() => {
+    try { window.localStorage.setItem(diaryKey, JSON.stringify(diary)) } catch { /* Storage may be disabled. */ }
+  }, [diary, diaryKey])
+
+  useEffect(() => {
     let cancelled = false
     const restore = async () => {
       if (user && supabase) {
@@ -151,13 +155,9 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
     }
     setPet(next)
     setMessage(line)
-    setDiary(currentDiary => {
-      const nextDiary = [line, ...currentDiary].slice(0, 6)
-      try { window.localStorage.setItem(diaryKey, JSON.stringify(nextDiary)) } catch { /* Storage may be disabled. */ }
-      return nextDiary
-    })
+    setDiary(currentDiary => [line, ...currentDiary].slice(0, 6))
     void persist(next)
-  }, [pet, persist, diaryKey])
+  }, [pet, persist])
 
   const saveName = () => {
     const name = rename.trim().slice(0, 16)
