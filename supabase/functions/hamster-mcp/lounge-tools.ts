@@ -1,4 +1,5 @@
 import { z } from 'npm:zod@^4.1.13'
+import type { McpServer } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/mcp.js'
 import { loungeRequestId } from './lounge_request.ts'
 import { clampLimit, errorResult, jsonResult, supabase, USER_ID } from '../_shared/mcp_common.ts'
 import {
@@ -49,7 +50,7 @@ export const LOUNGE_MCP_INSTRUCTIONS = [
   '留言：串串读过的页会留言（author=chuanchuan），read_diary 会随每页带出 comments；用 add_diary_comment 回复。',
 ].join('\n')
 
-export const registerLoungeTools = (server: any) => {
+export const registerLoungeTools = (server: McpServer) => {
   server.registerTool('lounge_list_members', {
     title: 'List Lounge Members',
     description: '列出客厅已登记的发言成员：sender_key、display_name、emoji。包含官客户端 Claude/GPT、API 与双 CLI；发言前查自己的真实端口，将 sender_key 原样传给 lounge_post.sender，也可用于 mentions 点名。',
