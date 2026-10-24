@@ -64,12 +64,10 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('星团正蜷在星窝里，等你来找它。')
   const [rename, setRename] = useState(INITIAL_STATE.name)
-  const [diary, setDiary] = useState<string[]>([FIRST_DIARY_ENTRY])
+  const [diary, setDiary] = useState<string[]>(() => loadLocalDiary(diaryKey))
 
   useEffect(() => {
     let cancelled = false
-    setReady(false)
-    setDiary(loadLocalDiary(diaryKey))
     const restore = async () => {
       if (user && supabase) {
         const { data, error } = await supabase
@@ -98,7 +96,7 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
     }
     void restore()
     return () => { cancelled = true }
-  }, [user, storageKey, diaryKey])
+  }, [user, storageKey])
 
   const persist = useCallback(async (next: PetState) => {
     window.localStorage.setItem(storageKey, JSON.stringify(next))
