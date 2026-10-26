@@ -6,3 +6,17 @@ export const storageKeysFor = (userId: string | null) => {
     diary: `moonlight-garden-diary-v1:${scope}`,
   }
 }
+
+/** Keep cloud saving functional when browser storage is unavailable or blocked. */
+export const saveLocalJson = (
+  key: string,
+  value: unknown,
+  getStorage: () => Pick<Storage, 'setItem'> = () => window.localStorage,
+): boolean => {
+  try {
+    getStorage().setItem(key, JSON.stringify(value))
+    return true
+  } catch {
+    return false
+  }
+}
