@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../supabase/client'
-import { storageKeysFor } from './starIslandStorage'
+import { saveLocalJson, storageKeysFor } from './starIslandStorage'
 import './StarIslandPage.css'
 
 type PetState = {
@@ -85,7 +85,7 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
           const restored = { ...INITIAL_STATE, ...data } as PetState
           setPet(restored)
           setRename(restored.name)
-          window.localStorage.setItem(storageKey, JSON.stringify(restored))
+          saveLocalJson(storageKey, restored)
         } else {
           const local = loadLocalState(storageKey)
           setPet(local)
@@ -103,9 +103,9 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
   }, [user, storageKey])
 
   const persist = useCallback(async (next: PetState) => {
-    window.localStorage.setItem(storageKey, JSON.stringify(next))
+    const localSaved = saveLocalJson(storageKey, next)
     if (!user || !supabase) {
-      setMessage('已保存在这台设备上；登录并配置云端存档后即可跨设备继续。')
+      setMessage(localSaved ? '已保存在这台设备上；登录并配置云端存档后即可跨设备继续。' : '当前浏览器无法保存本地存档，请检查存储权限。')
       return
     }
     setSaving(true)
@@ -116,7 +116,7 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
     }, { onConflict: 'user_id,pet_id' })
     setSaving(false)
     if (error) {
-      setMessage('本地已保存，但云端存档未成功写入。请稍后重试。')
+      setMessage(localSaved ? '本地已保存，但云端存档未成功写入。请稍后重试。' : '本地与云端存档均未成功，请检查存储权限或稍后重试。')
       console.error('[star-island] save failed', error)
     } else {
       setMessage('星团的成长已经保存到云端。')
