@@ -8,7 +8,7 @@ const pageSource = readFileSync(new URL('../src/pages/StarIslandPage.tsx', impor
 const compiled = ts.transpileModule(helperSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText
-const { storageKeysFor } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
+const { storageKeysFor, saveLocalJson } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
 
 test('pet and diary cache keys are distinct for different accounts and guests', () => {
   const a = storageKeysFor('account-a')
@@ -25,8 +25,22 @@ test('pet and diary cache keys are distinct for different accounts and guests', 
 test('star island page uses scoped keys and remounts on account switch', () => {
   assert.match(pageSource, /<StarIslandSession key=\{user\?\.id \?\? 'guest'\} user=\{user\}/)
   assert.match(pageSource, /loadLocalState\(storageKey\)/)
-  assert.match(pageSource, /localStorage\.setItem\(storageKey,/)
+  assert.match(pageSource, /saveLocalJson\(storageKey,/)
   assert.match(pageSource, /loadLocalDiary\(diaryKey\)/)
   assert.match(pageSource, /localStorage\.setItem\(diaryKey,/)
   assert.doesNotMatch(pageSource, /moonlight-garden-pet-state-v1/)
+})
+
+test('local cache write succeeds and serializes the state', () => {
+  const calls = []
+  const storage = { setItem: (key, value) => calls.push([key, value]) }
+  assert.equal(saveLocalJson('pet', { name: '星团' }, () => storage), true)
+  assert.deepEqual(calls, [['pet', JSON.stringify({ name: '星团' })]])
+})
+
+test('blocked storage does not interrupt cloud persistence', () => {
+  const denied = () => { throw new Error('SecurityError: storage unavailable') }
+  assert.equal(saveLocalJson('pet', { level: 2 }, denied), false)
+  assert.equal(saveLocalJson('pet', { level: 2 }, () => ({ setItem: denied })), false)
+  assert.match(pageSource, /const localSaved = saveLocalJson\(storageKey, next\)/)
 })
