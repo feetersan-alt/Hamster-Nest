@@ -20,3 +20,16 @@ export const saveLocalJson = (
     return false
   }
 }
+
+/** A locally saved pet can be newer than the last successful cloud write. */
+export const hasPendingCloudSync = (
+  key: string,
+  getStorage: () => Pick<Storage, 'getItem'> = () => window.localStorage,
+): boolean => {
+  try {
+    const raw = getStorage().getItem(key)
+    return raw ? JSON.parse(raw)?._pendingCloudSync === true : false
+  } catch {
+    return false
+  }
+}
