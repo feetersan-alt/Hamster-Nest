@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../supabase/client'
-import { saveLocalJson, storageKeysFor } from './starIslandStorage'
+import { hasPendingCloudSync, saveLocalJson, storageKeysFor } from './starIslandStorage'
 import './StarIslandPage.css'
 
 type PetState = {
@@ -38,7 +38,12 @@ const clamp = (value: number, min = 0, max = 100) => Math.max(min, Math.min(max,
 const loadLocalState = (key: string): PetState => {
   try {
     const raw = window.localStorage.getItem(key)
-    return raw ? { ...INITIAL_STATE, ...JSON.parse(raw) } : INITIAL_STATE
+    if (!raw) return INITIAL_STATE
+    const parsed: unknown = JSON.parse(raw)
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return INITIAL_STATE
+    const { _pendingCloudSync: ignored, ...saved } = parsed as Record<string, unknown>
+    void ignored
+    return { ...INITIAL_STATE, ...saved } as PetState
   } catch {
     return INITIAL_STATE
   }
@@ -73,53 +78,92 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
   useEffect(() => {
     let cancelled = false
     const restore = async () => {
-      if (user && supabase) {
-        const { data, error } = await supabase
-          .from('pet_states')
-          .select('pet_id,name,level,experience,hunger,joy,bond,stardust,star_candy,growth_stage,star_pattern')
-          .eq('user_id', user.id)
-          .eq('pet_id', INITIAL_STATE.pet_id)
-          .maybeSingle()
-        if (cancelled) return
-        if (data && !error) {
-          const restored = { ...INITIAL_STATE, ...data } as PetState
-          setPet(restored)
-          setRename(restored.name)
-          saveLocalJson(storageKey, restored)
-        } else {
-          const local = loadLocalState(storageKey)
-          setPet(local)
-          setRename(local.name)
-        }
-      } else {
-        const local = loadLocalState(storageKey)
-        setPet(local)
-        setRename(local.name)
+      const useLocal = () => {
+        const cached = loadLocalState(storageKey)
+        setPet(cached)
+        setRename(cached.name)
       }
-      if (!cancelled) setReady(true)
+      try {
+        if (user && supabase) {
+          if (hasPendingCloudSync(storageKey)) {
+            // Never overwrite unsynced local progress with an older cloud snapshot.
+            const cached = loadLocalState(storageKey)
+            if (cancelled) return
+            setPet(cached)
+            setRename(cached.name)
+            const { error } = await supabase.from('pet_states').upsert({
+              user_id: user.id,
+              ...cached,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'user_id,pet_id' })
+            if (cancelled) return
+            if (error) {
+              setMessage('已找回本地进度，但云端同步仍未成功；请稍后再试。')
+            } else {
+              saveLocalJson(storageKey, cached)
+            }
+          } else {
+            const { data, error } = await supabase
+              .from('pet_states')
+              .select('pet_id,name,level,experience,hunger,joy,bond,stardust,star_candy,growth_stage,star_pattern')
+              .eq('user_id', user.id)
+              .eq('pet_id', INITIAL_STATE.pet_id)
+              .maybeSingle()
+            if (cancelled) return
+            if (data && !error) {
+              const restored = { ...INITIAL_STATE, ...data } as PetState
+              setPet(restored)
+              setRename(restored.name)
+              saveLocalJson(storageKey, restored)
+            } else {
+              useLocal()
+            }
+          }
+        } else {
+          if (cancelled) return
+          useLocal()
+        }
+      } catch (error) {
+        if (!cancelled) {
+          useLocal()
+          setMessage('云端暂时不可用，已尝试找回本地进度。')
+          console.error('[star-island] restore failed', error)
+        }
+      } finally {
+        if (!cancelled) setReady(true)
+      }
     }
     void restore()
     return () => { cancelled = true }
   }, [user, storageKey])
 
   const persist = useCallback(async (next: PetState) => {
-    const localSaved = saveLocalJson(storageKey, next)
+    // Store the pending marker atomically with the pet state. A failed cloud
+    // write must not let a stale cloud snapshot replace newer local progress.
+    const localSaved = saveLocalJson(storageKey, user ? { ...next, _pendingCloudSync: true } : next)
     if (!user || !supabase) {
       setMessage(localSaved ? '已保存在这台设备上；登录并配置云端存档后即可跨设备继续。' : '当前浏览器无法保存本地存档，请检查存储权限。')
       return
     }
     setSaving(true)
-    const { error } = await supabase.from('pet_states').upsert({
-      user_id: user.id,
-      ...next,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id,pet_id' })
-    setSaving(false)
-    if (error) {
-      setMessage(localSaved ? '本地已保存，但云端存档未成功写入。请稍后重试。' : '本地与云端存档均未成功，请检查存储权限或稍后重试。')
+    try {
+      const { error } = await supabase.from('pet_states').upsert({
+        user_id: user.id,
+        ...next,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,pet_id' })
+      if (error) {
+        setMessage(localSaved ? '本地已保存，但云端存档未成功写入。请稍后重试。' : '本地与云端存档均未成功，请检查存储权限或稍后重试。')
+        console.error('[star-island] save failed', error)
+      } else {
+        if (localSaved) saveLocalJson(storageKey, next)
+        setMessage('星团的成长已经保存到云端。')
+      }
+    } catch (error) {
+      setMessage(localSaved ? '本地已保存，但云端暂不可用；下次进入会重试同步。' : '本地与云端均未保存成功，请稍后重试。')
       console.error('[star-island] save failed', error)
-    } else {
-      setMessage('星团的成长已经保存到云端。')
+    } finally {
+      setSaving(false)
     }
   }, [user, storageKey])
 
