@@ -8,7 +8,7 @@ const pageSource = readFileSync(new URL('../src/pages/StarIslandPage.tsx', impor
 const compiled = ts.transpileModule(helperSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText
-const { storageKeysFor, saveLocalJson } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
+const { storageKeysFor, saveLocalJson, hasPendingCloudSync } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
 
 test('pet and diary cache keys are distinct for different accounts and guests', () => {
   const a = storageKeysFor('account-a')
@@ -42,5 +42,37 @@ test('blocked storage does not interrupt cloud persistence', () => {
   const denied = () => { throw new Error('SecurityError: storage unavailable') }
   assert.equal(saveLocalJson('pet', { level: 2 }, denied), false)
   assert.equal(saveLocalJson('pet', { level: 2 }, () => ({ setItem: denied })), false)
-  assert.match(pageSource, /const localSaved = saveLocalJson\(storageKey, next\)/)
+  assert.match(pageSource, /_pendingCloudSync: true/)
+  assert.match(pageSource, /hasPendingCloudSync\(storageKey\)/)
+  assert.match(pageSource, /if \(localSaved\) saveLocalJson\(storageKey, next\)/)
+})
+
+test('pending cloud marker is stored with the pet and detected on reload', () => {
+  const key = storageKeysFor('account-a').pet
+  const state = { pet_id: 'xing-tuan', level: 4, _pendingCloudSync: true }
+  const store = new Map()
+  const storage = {
+    setItem: (k, v) => store.set(k, v),
+    getItem: k => store.get(k) ?? null,
+  }
+  assert.equal(saveLocalJson(key, state, () => storage), true)
+  assert.equal(hasPendingCloudSync(key, () => storage), true)
+  assert.equal(hasPendingCloudSync(storageKeysFor('account-b').pet, () => storage), false)
+  assert.equal(saveLocalJson(key, { pet_id: 'xing-tuan', level: 4 }, () => storage), true)
+  assert.equal(hasPendingCloudSync(key, () => storage), false)
+})
+
+test('blocked or malformed storage cannot crash pending detection', () => {
+  const blocked = () => { throw new Error('SecurityError') }
+  assert.equal(hasPendingCloudSync('pet', blocked), false)
+  assert.equal(hasPendingCloudSync('pet', () => ({ getItem: () => '{invalid' })), false)
+})
+
+test('restore preserves pending local state and retries cloud upsert', () => {
+  assert.match(pageSource, /if \(hasPendingCloudSync\(storageKey\)\)/)
+  assert.match(pageSource, /const cached = loadLocalState\(storageKey\)/)
+  assert.match(pageSource, /updated_at: new Date\(\)\.toISOString\(\)/)
+  assert.match(pageSource, /const \{ _pendingCloudSync: ignored, \.\.\.saved \}/)
+  assert.match(pageSource, /finally \{\s*if \(!cancelled\) setReady\(true\)/)
+  assert.match(pageSource, /finally \{\s*setSaving\(false\)/)
 })
