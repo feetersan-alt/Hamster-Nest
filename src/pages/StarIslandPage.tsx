@@ -78,7 +78,7 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
   useEffect(() => {
     let cancelled = false
     const restore = async () => {
-      const useLocal = () => {
+      const restoreLocal = () => {
         const cached = loadLocalState(storageKey)
         setPet(cached)
         setRename(cached.name)
@@ -116,16 +116,16 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
               setRename(restored.name)
               saveLocalJson(storageKey, restored)
             } else {
-              useLocal()
+              restoreLocal()
             }
           }
         } else {
           if (cancelled) return
-          useLocal()
+          restoreLocal()
         }
       } catch (error) {
         if (!cancelled) {
-          useLocal()
+          restoreLocal()
           setMessage('云端暂时不可用，已尝试找回本地进度。')
           console.error('[star-island] restore failed', error)
         }
