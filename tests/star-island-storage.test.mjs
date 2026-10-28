@@ -49,7 +49,7 @@ test('blocked storage does not interrupt cloud persistence', () => {
 
 test('pending cloud marker is stored with the pet and detected on reload', () => {
   const key = storageKeysFor('account-a').pet
-  const state = { pet_id: 'xing-tuan', level: 4, _pendingCloudSync: true }
+  const state = { pet_id: 'xing-tuan', name: '星团', level: 4, experience: 8, hunger: 72, joy: 72, bond: 10, stardust: 3, star_candy: 3, growth_stage: '成长期', star_pattern: '第一道微光星纹', _pendingCloudSync: true }
   const store = new Map()
   const storage = {
     setItem: (k, v) => store.set(k, v),
@@ -66,6 +66,16 @@ test('blocked or malformed storage cannot crash pending detection', () => {
   const blocked = () => { throw new Error('SecurityError') }
   assert.equal(hasPendingCloudSync('pet', blocked), false)
   assert.equal(hasPendingCloudSync('pet', () => ({ getItem: () => '{invalid' })), false)
+})
+
+test('corrupt pending cache never authorizes overwriting the cloud save', () => {
+  const state = { pet_id: 'xing-tuan', name: '星团', level: 4, experience: 8, hunger: 72, joy: 72, bond: 10, stardust: 3, star_candy: 3, growth_stage: '成长期', star_pattern: '第一道微光星纹', _pendingCloudSync: true }
+  const read = value => () => ({ getItem: () => JSON.stringify(value) })
+  assert.equal(hasPendingCloudSync('pet', read({ _pendingCloudSync: true })), false)
+  assert.equal(hasPendingCloudSync('pet', read({ ...state, pet_id: 'another-pet' })), false)
+  assert.equal(hasPendingCloudSync('pet', read({ ...state, level: 'broken' })), false)
+  assert.equal(hasPendingCloudSync('pet', read({ ...state, star_candy: null })), false)
+  assert.equal(hasPendingCloudSync('pet', read(state)), true)
 })
 
 test('restore preserves pending local state and retries cloud upsert', () => {
