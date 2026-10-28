@@ -28,7 +28,18 @@ export const hasPendingCloudSync = (
 ): boolean => {
   try {
     const raw = getStorage().getItem(key)
-    return raw ? JSON.parse(raw)?._pendingCloudSync === true : false
+    if (!raw) return false
+    const parsed: unknown = JSON.parse(raw)
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return false
+    const state = parsed as Record<string, unknown>
+    // A broken pending marker must never replace a valid cloud save with defaults.
+    return state._pendingCloudSync === true
+      && state.pet_id === 'xing-tuan'
+      && typeof state.name === 'string'
+      && typeof state.growth_stage === 'string'
+      && typeof state.star_pattern === 'string'
+      && ['level', 'experience', 'hunger', 'joy', 'bond', 'stardust', 'star_candy']
+        .every(field => typeof state[field] === 'number' && Number.isFinite(state[field]))
   } catch {
     return false
   }
