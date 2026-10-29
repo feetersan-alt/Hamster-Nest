@@ -42,5 +42,10 @@ create policy "Users can delete their own pet states"
 
 create index if not exists pet_states_user_id_idx on public.pet_states(user_id);
 
--- Explicit Data API privileges for trusted server-side operations.
+-- The browser uses the authenticated role; RLS above still restricts each row
+-- to auth.uid(). Do not rely on project-specific default table grants.
+revoke all on table public.pet_states from anon;
+grant select, insert, update, delete on table public.pet_states to authenticated;
+
+-- Trusted server-side operations retain their explicit privileges.
 grant select, insert, update, delete on table public.pet_states to service_role;
