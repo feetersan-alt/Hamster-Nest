@@ -86,3 +86,12 @@ test('restore preserves pending local state and retries cloud upsert', () => {
   assert.match(pageSource, /finally \{\s*if \(!cancelled\) setReady\(true\)/)
   assert.match(pageSource, /finally \{\s*setSaving\(false\)/)
 })
+
+
+test('pet_states migration grants browser access under RLS', () => {
+  const migration = readFileSync(new URL('../supabase/migrations/20261018000000_create_pet_states.sql', import.meta.url), 'utf8')
+  assert.match(migration, /alter table public\.pet_states enable row level security;/i)
+  assert.match(migration, /revoke all on table public\.pet_states from anon;/i)
+  assert.match(migration, /grant select, insert, update, delete on table public\.pet_states to authenticated;/i)
+  assert.match(migration, /with check \(auth\.uid\(\) = user_id\)/i)
+})
