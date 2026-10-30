@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../supabase/client'
-import { hasPendingCloudSync, saveLocalJson, storageKeysFor } from './starIslandStorage'
+import { hasPendingCloudSync, isValidPetState, saveLocalJson, storageKeysFor } from './starIslandStorage'
 import './StarIslandPage.css'
 
 type PetState = {
@@ -43,7 +43,7 @@ const loadLocalState = (key: string): PetState => {
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return INITIAL_STATE
     const { _pendingCloudSync: ignored, ...saved } = parsed as Record<string, unknown>
     void ignored
-    return { ...INITIAL_STATE, ...saved } as PetState
+    return isValidPetState(saved) ? { ...INITIAL_STATE, ...saved } as PetState : INITIAL_STATE
   } catch {
     return INITIAL_STATE
   }
