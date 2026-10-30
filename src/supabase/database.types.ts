@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      pet_states: {
+        Row: {
+          id: string
+          user_id: string
+          pet_id: string
+          name: string
+          level: number
+          experience: number
+          hunger: number
+          joy: number
+          bond: number
+          stardust: number
+          star_candy: number
+          growth_stage: string
+          star_pattern: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          pet_id?: string
+          name?: string
+          level?: number
+          experience?: number
+          hunger?: number
+          joy?: number
+          bond?: number
+          stardust?: number
+          star_candy?: number
+          growth_stage?: string
+          star_pattern?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          pet_id?: string
+          name?: string
+          level?: number
+          experience?: number
+          hunger?: number
+          joy?: number
+          bond?: number
+          stardust?: number
+          star_candy?: number
+          growth_stage?: string
+          star_pattern?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       agent_council: {
         Row: {
           category: string | null
