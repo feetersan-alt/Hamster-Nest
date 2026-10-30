@@ -21,6 +21,27 @@ export const saveLocalJson = (
   }
 }
 
+/** Reject malformed or out-of-range local saves before they can replace cloud progress. */
+export const isValidPetState = (value: unknown): boolean => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const state = value as Record<string, unknown>
+  const integer = (key: string, min: number, max = Number.MAX_SAFE_INTEGER) =>
+    typeof state[key] === 'number' && Number.isSafeInteger(state[key])
+    && (state[key] as number) >= min && (state[key] as number) <= max
+
+  return state.pet_id === 'xing-tuan'
+    && typeof state.name === 'string' && state.name.trim().length > 0 && state.name.length <= 16
+    && typeof state.growth_stage === 'string'
+    && typeof state.star_pattern === 'string'
+    && integer('level', 1)
+    && integer('experience', 0)
+    && integer('hunger', 0, 100)
+    && integer('joy', 0, 100)
+    && integer('bond', 0, 100)
+    && integer('stardust', 0)
+    && integer('star_candy', 0)
+}
+
 /** A locally saved pet can be newer than the last successful cloud write. */
 export const hasPendingCloudSync = (
   key: string,
@@ -30,16 +51,9 @@ export const hasPendingCloudSync = (
     const raw = getStorage().getItem(key)
     if (!raw) return false
     const parsed: unknown = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return false
-    const state = parsed as Record<string, unknown>
-    // A broken pending marker must never replace a valid cloud save with defaults.
-    return state._pendingCloudSync === true
-      && state.pet_id === 'xing-tuan'
-      && typeof state.name === 'string'
-      && typeof state.growth_stage === 'string'
-      && typeof state.star_pattern === 'string'
-      && ['level', 'experience', 'hunger', 'joy', 'bond', 'stardust', 'star_candy']
-        .every(field => typeof state[field] === 'number' && Number.isFinite(state[field]))
+    return !!parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      && (parsed as Record<string, unknown>)._pendingCloudSync === true
+      && isValidPetState(parsed)
   } catch {
     return false
   }
