@@ -8,7 +8,7 @@ const pageSource = readFileSync(new URL('../src/pages/StarIslandPage.tsx', impor
 const compiled = ts.transpileModule(helperSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText
-const { storageKeysFor, saveLocalJson, hasPendingCloudSync } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
+const { storageKeysFor, saveLocalJson, hasPendingCloudSync, isValidPetState } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
 
 test('pet and diary cache keys are distinct for different accounts and guests', () => {
   const a = storageKeysFor('account-a')
@@ -76,6 +76,28 @@ test('corrupt pending cache never authorizes overwriting the cloud save', () => 
   assert.equal(hasPendingCloudSync('pet', read({ ...state, level: 'broken' })), false)
   assert.equal(hasPendingCloudSync('pet', read({ ...state, star_candy: null })), false)
   assert.equal(hasPendingCloudSync('pet', read(state)), true)
+})
+
+
+test('invalid local cache is rejected instead of displayed or synced over valid cloud data', () => {
+  const valid = { pet_id: 'xing-tuan', name: '星团', level: 4, experience: 8, hunger: 72, joy: 72, bond: 10, stardust: 3, star_candy: 3, growth_stage: '成长期', star_pattern: '第一道微光星纹' }
+  const pending = value => () => ({ getItem: () => JSON.stringify({ ...value, _pendingCloudSync: true }) })
+  assert.equal(isValidPetState(valid), true)
+  for (const invalid of [
+    { ...valid, level: -1 },
+    { ...valid, experience: -1 },
+    { ...valid, hunger: 101 },
+    { ...valid, bond: Number.POSITIVE_INFINITY },
+    { ...valid, star_candy: 1.5 },
+    { ...valid, name: '' },
+    { ...valid, pet_id: 'other-pet' },
+    { ...valid, stardust: -1 },
+  ]) {
+    assert.equal(isValidPetState(invalid), false)
+    assert.equal(hasPendingCloudSync('pet', pending(invalid)), false)
+  }
+  assert.equal(hasPendingCloudSync('pet', pending(valid)), true)
+  assert.match(pageSource, /isValidPetState\(saved\) \?/)
 })
 
 test('restore preserves pending local state and retries cloud upsert', () => {
