@@ -25,9 +25,11 @@ export const saveLocalJson = (
 export const isValidPetState = (value: unknown): boolean => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false
   const state = value as Record<string, unknown>
-  const integer = (key: string, min: number, max = Number.MAX_SAFE_INTEGER) =>
-    typeof state[key] === 'number' && Number.isSafeInteger(state[key])
-    && (state[key] as number) >= min && (state[key] as number) <= max
+  const integer = (key: string, min: number, max = Number.MAX_SAFE_INTEGER) => {
+    const value = state[key]
+    return typeof value === 'number' && Number.isSafeInteger(value)
+      && value >= min && value <= max
+  }
 
   return state.pet_id === 'xing-tuan'
     && typeof state.name === 'string' && state.name.trim().length > 0 && state.name.length <= 16
