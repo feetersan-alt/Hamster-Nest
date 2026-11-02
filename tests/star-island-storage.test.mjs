@@ -8,7 +8,7 @@ const pageSource = readFileSync(new URL('../src/pages/StarIslandPage.tsx', impor
 const compiled = ts.transpileModule(helperSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText
-const { storageKeysFor, saveLocalJson, hasPendingCloudSync, isValidPetState } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
+const { storageKeysFor, saveLocalJson, hasPendingCloudSync, isValidPetState, canWriteCloud } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
 
 test('pet and diary cache keys are distinct for different accounts and guests', () => {
   const a = storageKeysFor('account-a')
@@ -116,4 +116,15 @@ test('pet_states migration grants browser access under RLS', () => {
   assert.match(migration, /revoke all on table public\.pet_states from anon;/i)
   assert.match(migration, /grant select, insert, update, delete on table public\.pet_states to authenticated;/i)
   assert.match(migration, /with check \(auth\.uid\(\) = user_id\)/i)
+})
+
+
+test('authenticated cloud writes require a known cloud state or a pending sync', () => {
+  assert.equal(canWriteCloud({ authenticated: false, cloudStateKnown: false, pendingSync: false }), true)
+  assert.equal(canWriteCloud({ authenticated: true, cloudStateKnown: false, pendingSync: false }), false)
+  assert.equal(canWriteCloud({ authenticated: true, cloudStateKnown: true, pendingSync: false }), true)
+  assert.equal(canWriteCloud({ authenticated: true, cloudStateKnown: false, pendingSync: true }), true)
+  assert.match(pageSource, /if \(user && !cloudWriteReady\)/)
+  assert.match(pageSource, /只读模式/)
+  assert.match(pageSource, /disabled=\{saving \|\| \(user && !cloudWriteReady\)/)
 })
