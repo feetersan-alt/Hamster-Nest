@@ -60,3 +60,15 @@ export const hasPendingCloudSync = (
     return false
   }
 }
+
+
+/** A signed-in save is safe only after a successful cloud read or a known pending write. */
+export const canWriteCloud = ({
+  authenticated,
+  cloudStateKnown,
+  pendingSync,
+}: {
+  authenticated: boolean
+  cloudStateKnown: boolean
+  pendingSync: boolean
+}): boolean => !authenticated || cloudStateKnown || pendingSync
