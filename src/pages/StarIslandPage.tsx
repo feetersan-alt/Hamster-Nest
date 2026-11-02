@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../supabase/client'
-import { hasPendingCloudSync, isValidPetState, saveLocalJson, storageKeysFor } from './starIslandStorage'
+import { canWriteCloud, hasPendingCloudSync, isValidPetState, saveLocalJson, storageKeysFor } from './starIslandStorage'
 import './StarIslandPage.css'
 
 type PetState = {
@@ -67,6 +67,7 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
   const [pet, setPet] = useState<PetState>(INITIAL_STATE)
   const [ready, setReady] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [cloudWriteReady, setCloudWriteReady] = useState(!user)
   const [message, setMessage] = useState('星团正蜷在星窝里，等你来找它。')
   const [rename, setRename] = useState(INITIAL_STATE.name)
   const [diary, setDiary] = useState<string[]>(() => loadLocalDiary(diaryKey))
@@ -85,8 +86,10 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
       }
       try {
         if (user && supabase) {
-          if (hasPendingCloudSync(storageKey)) {
-            // Never overwrite unsynced local progress with an older cloud snapshot.
+          const pendingSync = hasPendingCloudSync(storageKey)
+          if (pendingSync) {
+            // A pending marker means the local state came from a previously verified cloud session.
+            setCloudWriteReady(canWriteCloud({ authenticated: true, cloudStateKnown: false, pendingSync: true }))
             const cached = loadLocalState(storageKey)
             if (cancelled) return
             setPet(cached)
@@ -110,23 +113,32 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
               .eq('pet_id', INITIAL_STATE.pet_id)
               .maybeSingle()
             if (cancelled) return
-            if (data && !error) {
-              const restored = { ...INITIAL_STATE, ...data } as PetState
-              setPet(restored)
-              setRename(restored.name)
-              saveLocalJson(storageKey, restored)
-            } else {
+            if (error) {
               restoreLocal()
+              setMessage('云端读取失败，已显示本地缓存；为避免覆盖云端进度，当前暂为只读模式。恢复连接后请刷新。')
+            } else {
+              setCloudWriteReady(canWriteCloud({ authenticated: true, cloudStateKnown: true, pendingSync: false }))
+              if (data) {
+                const restored = { ...INITIAL_STATE, ...data } as PetState
+                setPet(restored)
+                setRename(restored.name)
+                saveLocalJson(storageKey, restored)
+              } else {
+                restoreLocal()
+              }
             }
           }
         } else {
           if (cancelled) return
           restoreLocal()
+          if (user) setMessage('云端存档服务未连接；已显示本地缓存，当前暂为只读模式。')
         }
       } catch (error) {
         if (!cancelled) {
           restoreLocal()
-          setMessage('云端暂时不可用，已尝试找回本地进度。')
+          setMessage(user && !hasPendingCloudSync(storageKey)
+            ? '云端状态无法确认，已显示本地缓存；当前暂为只读模式。恢复连接后请刷新。'
+            : '云端暂不可用，已找回待同步的本地进度。')
           console.error('[star-island] restore failed', error)
         }
       } finally {
@@ -138,6 +150,10 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
   }, [user, storageKey])
 
   const persist = useCallback(async (next: PetState) => {
+    if (user && !cloudWriteReady) {
+      setMessage('云端状态尚未确认，已暂时锁定互动，避免覆盖已有存档。恢复连接后刷新页面即可重试。')
+      return
+    }
     // Store the pending marker atomically with the pet state. A failed cloud
     // write must not let a stale cloud snapshot replace newer local progress.
     const localSaved = saveLocalJson(storageKey, user ? { ...next, _pendingCloudSync: true } : next)
@@ -165,7 +181,7 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
     } finally {
       setSaving(false)
     }
-  }, [user, storageKey])
+  }, [user, storageKey, cloudWriteReady])
 
   const act = useCallback((kind: 'feed' | 'pet' | 'play' | 'stay') => {
     let next: PetState
@@ -222,7 +238,7 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
       <header className="star-island__header">
         <a href="#/" className="star-island__back">← 回到小窝</a>
         <div><p className="star-island__eyebrow">MOONLIGHT GARDEN · PET JOURNAL</p><h1>月光花园</h1><p>每一段被认真记住的经历，都会成为星屿灵身上的微光。</p></div>
-        <span className="star-island__save">{saving ? '存档中…' : user ? '云端存档' : '本地模式'}</span>
+        <span className="star-island__save">{saving ? '存档中…' : user && !cloudWriteReady ? '只读恢复' : user ? '云端存档' : '本地模式'}</span>
       </header>
 
       <section className="star-island__hero glass-panel">
@@ -256,12 +272,12 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
           <div className="star-island__panel-heading"><div><p className="star-island__eyebrow">SPEND A LITTLE TIME</p><h2>陪星团一会儿</h2></div><span>今天不用赶进度</span></div>
           <p className="star-island__message" role="status">{message}</p>
           <div className="star-island__actions">
-            <button onClick={() => act('feed')} disabled={saving || pet.star_candy <= 0}>🍬 喂星星糖</button>
-            <button onClick={() => act('pet')} disabled={saving}>☁️ 摸摸云团</button>
-            <button onClick={() => act('play')} disabled={saving}>✨ 追逐萤光</button>
-            <button onClick={() => act('stay')} disabled={saving}>🌙 一起发呆</button>
+            <button onClick={() => act('feed')} disabled={saving || (user && !cloudWriteReady) || pet.star_candy <= 0}>🍬 喂星星糖</button>
+            <button onClick={() => act('pet')} disabled={saving || (user && !cloudWriteReady)}>☁️ 摸摸云团</button>
+            <button onClick={() => act('play')} disabled={saving || (user && !cloudWriteReady)}>✨ 追逐萤光</button>
+            <button onClick={() => act('stay')} disabled={saving || (user && !cloudWriteReady)}>🌙 一起发呆</button>
           </div>
-          <div className="star-island__rename"><label htmlFor="pet-name">给它取个新名字</label><div><input id="pet-name" value={rename} maxLength={16} onChange={event => setRename(event.target.value)} /><button onClick={saveName} disabled={saving}>记下名字</button></div></div>
+          <div className="star-island__rename"><label htmlFor="pet-name">给它取个新名字</label><div><input id="pet-name" value={rename} maxLength={16} disabled={!!user && !cloudWriteReady} onChange={event => setRename(event.target.value)} /><button onClick={saveName} disabled={saving || (user && !cloudWriteReady)}>记下名字</button></div></div>
         </div>
         <aside className="star-island__panel glass-panel">
           <div className="star-island__panel-heading"><div><p className="star-island__eyebrow">LITTLE MEMORIES</p><h2>花园手记</h2></div><span>最近 6 条</span></div>
