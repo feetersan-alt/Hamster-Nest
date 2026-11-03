@@ -272,12 +272,12 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
           <div className="star-island__panel-heading"><div><p className="star-island__eyebrow">SPEND A LITTLE TIME</p><h2>陪星团一会儿</h2></div><span>今天不用赶进度</span></div>
           <p className="star-island__message" role="status">{message}</p>
           <div className="star-island__actions">
-            <button onClick={() => act('feed')} disabled={saving || (user && !cloudWriteReady) || pet.star_candy <= 0}>🍬 喂星星糖</button>
-            <button onClick={() => act('pet')} disabled={saving || (user && !cloudWriteReady)}>☁️ 摸摸云团</button>
-            <button onClick={() => act('play')} disabled={saving || (user && !cloudWriteReady)}>✨ 追逐萤光</button>
-            <button onClick={() => act('stay')} disabled={saving || (user && !cloudWriteReady)}>🌙 一起发呆</button>
+            <button onClick={() => act('feed')} disabled={saving || (!!user && !cloudWriteReady) || pet.star_candy <= 0}>🍬 喂星星糖</button>
+            <button onClick={() => act('pet')} disabled={saving || (!!user && !cloudWriteReady)}>☁️ 摸摸云团</button>
+            <button onClick={() => act('play')} disabled={saving || (!!user && !cloudWriteReady)}>✨ 追逐萤光</button>
+            <button onClick={() => act('stay')} disabled={saving || (!!user && !cloudWriteReady)}>🌙 一起发呆</button>
           </div>
-          <div className="star-island__rename"><label htmlFor="pet-name">给它取个新名字</label><div><input id="pet-name" value={rename} maxLength={16} disabled={!!user && !cloudWriteReady} onChange={event => setRename(event.target.value)} /><button onClick={saveName} disabled={saving || (user && !cloudWriteReady)}>记下名字</button></div></div>
+          <div className="star-island__rename"><label htmlFor="pet-name">给它取个新名字</label><div><input id="pet-name" value={rename} maxLength={16} disabled={!!user && !cloudWriteReady} onChange={event => setRename(event.target.value)} /><button onClick={saveName} disabled={saving || (!!user && !cloudWriteReady)}>记下名字</button></div></div>
         </div>
         <aside className="star-island__panel glass-panel">
           <div className="star-island__panel-heading"><div><p className="star-island__eyebrow">LITTLE MEMORIES</p><h2>花园手记</h2></div><span>最近 6 条</span></div>
