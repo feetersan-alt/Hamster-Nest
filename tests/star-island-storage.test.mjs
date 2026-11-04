@@ -23,11 +23,11 @@ test('pet and diary cache keys are distinct for different accounts and guests', 
 })
 
 test('star island page uses scoped keys and remounts on account switch', () => {
-  assert.match(pageSource, /<StarIslandSession key=\{user\?\.id \?\? 'guest'\} user=\{user\}/)
-  assert.match(pageSource, /loadLocalState\(storageKey\)/)
-  assert.match(pageSource, /saveLocalJson\(storageKey,/)
-  assert.match(pageSource, /loadLocalDiary\(diaryKey\)/)
-  assert.match(pageSource, /localStorage\.setItem\(diaryKey,/)
+  assert.match(pageSource, /<StarIslandSession key=\\{user\\?\\.id \\?\\? 'guest'\\} user=\\{user\\}/)
+  assert.match(pageSource, /loadLocalState\\(storageKey\\)/)
+  assert.match(pageSource, /saveLocalJson\\(storageKey,/)
+  assert.match(pageSource, /loadLocalDiary\\(diaryKey\\)/)
+  assert.match(pageSource, /localStorage\\.setItem\\(diaryKey,/)
   assert.doesNotMatch(pageSource, /moonlight-garden-pet-state-v1/)
 })
 
@@ -43,8 +43,8 @@ test('blocked storage does not interrupt cloud persistence', () => {
   assert.equal(saveLocalJson('pet', { level: 2 }, denied), false)
   assert.equal(saveLocalJson('pet', { level: 2 }, () => ({ setItem: denied })), false)
   assert.match(pageSource, /_pendingCloudSync: true/)
-  assert.match(pageSource, /hasPendingCloudSync\(storageKey\)/)
-  assert.match(pageSource, /if \(localSaved\) saveLocalJson\(storageKey, next\)/)
+  assert.match(pageSource, /hasPendingCloudSync\\(storageKey\\)/)
+  assert.match(pageSource, /if \\(localSaved\\) saveLocalJson\\(storageKey, next\\)/)
 })
 
 test('pending cloud marker is stored with the pet and detected on reload', () => {
@@ -97,34 +97,34 @@ test('invalid local cache is rejected instead of displayed or synced over valid 
     assert.equal(hasPendingCloudSync('pet', pending(invalid)), false)
   }
   assert.equal(hasPendingCloudSync('pet', pending(valid)), true)
-  assert.match(pageSource, /isValidPetState\(saved\) \?/)
+  assert.match(pageSource, /isValidPetState\\(saved\\) \\?/)
 })
 
 test('restore preserves pending local state and retries cloud upsert', () => {
-  assert.match(pageSource, /if \(hasPendingCloudSync\(storageKey\)\)/)
-  assert.match(pageSource, /const cached = loadLocalState\(storageKey\)/)
-  assert.match(pageSource, /updated_at: new Date\(\)\.toISOString\(\)/)
-  assert.match(pageSource, /const \{ _pendingCloudSync: ignored, \.\.\.saved \}/)
-  assert.match(pageSource, /finally \{\s*if \(!cancelled\) setReady\(true\)/)
-  assert.match(pageSource, /finally \{\s*setSaving\(false\)/)
+  assert.match(pageSource, /const pendingSync = hasPendingCloudSync\\(storageKey\\);\\s*if \\(pendingSync\\)/)
+  assert.match(pageSource, /const cached = loadLocalState\\(storageKey\\)/)
+  assert.match(pageSource, /updated_at: new Date\\(\\)\\.toISOString\\(\\)/)
+  assert.match(pageSource, /const \\{ _pendingCloudSync: ignored, \\.\\.\\.saved \\}/)
+  assert.match(pageSource, /finally \\{\\s*if \\(!cancelled\\) setReady\\(true\\)/)
+  assert.match(pageSource, /finally \\{\\s*setSaving\\(false\\)/)
 })
 
 
 test('pet_states migration grants browser access under RLS', () => {
   const migration = readFileSync(new URL('../supabase/migrations/20261018000000_create_pet_states.sql', import.meta.url), 'utf8')
-  assert.match(migration, /alter table public\.pet_states enable row level security;/i)
-  assert.match(migration, /revoke all on table public\.pet_states from anon;/i)
-  assert.match(migration, /grant select, insert, update, delete on table public\.pet_states to authenticated;/i)
-  assert.match(migration, /with check \(auth\.uid\(\) = user_id\)/i)
+  assert.match(migration, /alter table public\\.pet_states enable row level security;/i)
+  assert.match(migration, /revoke all on table public\\.pet_states from anon;/i)
+  assert.match(migration, /grant select, insert, update, delete on table public\\.pet_states to authenticated;/i)
+  assert.match(migration, /with check \\(auth\\.uid\\(\\) = user_id\\)/i)
 })
-
 
 test('authenticated cloud writes require a known cloud state or a pending sync', () => {
   assert.equal(canWriteCloud({ authenticated: false, cloudStateKnown: false, pendingSync: false }), true)
   assert.equal(canWriteCloud({ authenticated: true, cloudStateKnown: false, pendingSync: false }), false)
   assert.equal(canWriteCloud({ authenticated: true, cloudStateKnown: true, pendingSync: false }), true)
   assert.equal(canWriteCloud({ authenticated: true, cloudStateKnown: false, pendingSync: true }), true)
-  assert.match(pageSource, /if \(user && !cloudWriteReady\)/)
+  assert.match(pageSource, /if \\(user && !cloudWriteReady\\)/)
   assert.match(pageSource, /只读模式/)
-  assert.match(pageSource, /disabled=\{saving \|\| \(user && !cloudWriteReady\)/)
+  assert.match(pageSource, /disabled=\\{saving \\|\\| \\(!!user && !cloudWriteReady\\) \\|\\| pet\\.star_candy <= 0\\}/)
+  assert.match(pageSource, /disabled=\\{saving \\|\\| \\(!!user && !cloudWriteReady\\)\\}/)
 })
