@@ -101,7 +101,7 @@ test('invalid local cache is rejected instead of displayed or synced over valid 
 })
 
 test('restore preserves pending local state and retries cloud upsert', () => {
-  assert.match(pageSource, /const pendingSync = hasPendingCloudSync\(storageKey\);\s*if \(pendingSync\)/)
+  assert.match(pageSource, /const pendingSync = hasPendingCloudSync\(storageKey\);?\s*if \(pendingSync\)/)
   assert.match(pageSource, /const cached = loadLocalState\(storageKey\)/)
   assert.match(pageSource, /updated_at: new Date\(\)\.toISOString\(\)/)
   assert.match(pageSource, /const \{ _pendingCloudSync: ignored, \.\.\.saved \}/)
