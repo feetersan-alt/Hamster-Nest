@@ -97,7 +97,7 @@ test('invalid local cache is rejected instead of displayed or synced over valid 
     assert.equal(hasPendingCloudSync('pet', pending(invalid)), false)
   }
   assert.equal(hasPendingCloudSync('pet', pending(valid)), true)
-  assert.match(pageSource, /isValidPetState\(saved\) \?/)
+  assert.match(pageSource, /readLocalPetCache\(key\)/)
 })
 
 test('pending cache retains its cloud-version baseline without mixing metadata into pet state', () => {
