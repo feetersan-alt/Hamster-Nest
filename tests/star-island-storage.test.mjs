@@ -147,6 +147,7 @@ test('pending restore and cloud writes use compare-and-swap rather than blind up
   assert.match(pageSource, /\.insert\(payload\)/)
   assert.match(pageSource, /\.update\(payload\)/)
   assert.match(pageSource, /updated_at: nextVersion/)
+  assert.match(pageSource, /nextVersion: data\?\.updated_at \?\? nextVersion/)
   assert.match(pageSource, /else if \(!data\)/)
   assert.doesNotMatch(pageSource, /\.upsert\(/)
 })
@@ -157,6 +158,8 @@ test('pet_states migration grants browser access under RLS', () => {
   assert.match(migration, /revoke all on table public\.pet_states from anon;/i)
   assert.match(migration, /grant select, insert, update, delete on table public\.pet_states to authenticated;/i)
   assert.match(migration, /with check \(auth\.uid\(\) = user_id\)/i)
+  assert.match(migration, /create or replace function public\.set_pet_states_updated_at\(\)/i)
+  assert.match(migration, /before insert or update on public\.pet_states/i)
 })
 
 test('authenticated cloud writes require a known cloud state or a pending sync', () => {
