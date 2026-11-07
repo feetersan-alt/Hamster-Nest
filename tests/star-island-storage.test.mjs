@@ -44,7 +44,7 @@ test('blocked storage does not interrupt cloud persistence', () => {
   assert.equal(saveLocalJson('pet', { level: 2 }, () => ({ setItem: denied })), false)
   assert.match(pageSource, /_pendingCloudSync: true/)
   assert.match(pageSource, /readLocalPetCache\(storageKey\)/)
-  assert.match(pageSource, /if \(localSaved\) saveLocalJson\(storageKey, next\)/)
+  assert.match(pageSource, /if \(localSaved\) saveLocalJson\(storageKey, \{ \.\.\.next, _cloudBaseUpdatedAt: nextVersion \}\)/)
 })
 
 test('pending cloud marker is stored with the pet and detected on reload', () => {
