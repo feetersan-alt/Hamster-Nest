@@ -17,6 +17,28 @@ create table if not exists public.pet_states (
   unique (user_id, pet_id)
 );
 
+-- Make updated_at a server-controlled, strictly increasing optimistic-lock version.
+create or replace function public.set_pet_states_updated_at()
+returns trigger
+language plpgsql
+set search_path = pg_catalog
+as $
+begin
+  if tg_op = 'INSERT' then
+    new.updated_at := clock_timestamp();
+  else
+    new.updated_at := greatest(clock_timestamp(), old.updated_at + interval '1 millisecond');
+  end if;
+  return new;
+end;
+$;
+
+drop trigger if exists pet_states_updated_at on public.pet_states;
+create trigger pet_states_updated_at
+  before insert or update on public.pet_states
+  for each row execute function public.set_pet_states_updated_at();
+
+
 alter table public.pet_states enable row level security;
 
 drop policy if exists "Users can read their own pet states" on public.pet_states;
