@@ -68,7 +68,7 @@ const writeCloudSnapshot = async (
       .insert(payload)
       .select('updated_at')
       .maybeSingle()
-    return { data, error, nextVersion }
+    return { data, error, nextVersion: data?.updated_at ?? nextVersion }
   }
 
   const { data, error } = await supabase
@@ -79,7 +79,7 @@ const writeCloudSnapshot = async (
     .eq('updated_at', baseUpdatedAt)
     .select('updated_at')
     .maybeSingle()
-  return { data, error, nextVersion }
+  return { data, error, nextVersion: data?.updated_at ?? nextVersion }
 }
 
 const StarIslandSession = ({ user }: StarIslandPageProps) => {
