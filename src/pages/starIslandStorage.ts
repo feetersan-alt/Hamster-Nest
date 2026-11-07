@@ -44,23 +44,61 @@ export const isValidPetState = (value: unknown): boolean => {
     && integer('star_candy', 0)
 }
 
-/** A locally saved pet can be newer than the last successful cloud write. */
-export const hasPendingCloudSync = (
+export type LocalPetCache = {
+  state: Record<string, unknown>
+  pendingCloudSync: boolean
+  cloudBaseUpdatedAt: string | null | undefined
+}
+
+const isValidCloudBaseUpdatedAt = (value: unknown): value is string =>
+  typeof value === 'string' && Number.isFinite(Date.parse(value))
+
+/** Read a validated local snapshot and its cloud-version baseline. */
+export const readLocalPetCache = (
   key: string,
   getStorage: () => Pick<Storage, 'getItem'> = () => window.localStorage,
-): boolean => {
+): LocalPetCache | null => {
   try {
     const raw = getStorage().getItem(key)
-    if (!raw) return false
+    if (!raw) return null
     const parsed: unknown = JSON.parse(raw)
-    return !!parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-      && (parsed as Record<string, unknown>)._pendingCloudSync === true
-      && isValidPetState(parsed)
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null
+
+    const record = parsed as Record<string, unknown>
+    const { _pendingCloudSync, _cloudBaseUpdatedAt, ...state } = record
+    if (!isValidPetState(state)) return null
+
+    const hasBaseline = Object.prototype.hasOwnProperty.call(record, '_cloudBaseUpdatedAt')
+    const cloudBaseUpdatedAt = !hasBaseline
+      ? undefined
+      : _cloudBaseUpdatedAt === null
+        ? null
+        : isValidCloudBaseUpdatedAt(_cloudBaseUpdatedAt)
+          ? _cloudBaseUpdatedAt
+          : undefined
+
+    return {
+      state,
+      pendingCloudSync: _pendingCloudSync === true,
+      cloudBaseUpdatedAt,
+    }
   } catch {
-    return false
+    return null
   }
 }
 
+/** Keep the pending flag check tolerant of blocked or malformed browser storage. */
+export const hasPendingCloudSync = (
+  key: string,
+  getStorage: () => Pick<Storage, 'getItem'> = () => window.localStorage,
+): boolean => readLocalPetCache(key, getStorage)?.pendingCloudSync ?? false
+
+/** Produce a version strictly newer than the baseline, even if the local clock has not advanced. */
+export const nextCloudUpdatedAt = (baseUpdatedAt: string | null, now = Date.now()): string => {
+  const baseTime = baseUpdatedAt === null ? Number.NEGATIVE_INFINITY : Date.parse(baseUpdatedAt)
+  const minimum = Number.isFinite(baseTime) ? baseTime + 1 : 0
+  return new Date(Math.max(now, minimum)).toISOString()
+}
 
 /** A signed-in save is safe only after a successful cloud read or a known pending write. */
 export const canWriteCloud = ({
