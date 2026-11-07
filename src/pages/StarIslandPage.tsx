@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../supabase/client'
-import { canWriteCloud, hasPendingCloudSync, isValidPetState, saveLocalJson, storageKeysFor } from './starIslandStorage'
+import { nextCloudUpdatedAt, readLocalPetCache, saveLocalJson, storageKeysFor } from './starIslandStorage'
 import './StarIslandPage.css'
 
 type PetState = {
@@ -36,17 +36,8 @@ const INITIAL_STATE: PetState = {
 
 const clamp = (value: number, min = 0, max = 100) => Math.max(min, Math.min(max, value))
 const loadLocalState = (key: string): PetState => {
-  try {
-    const raw = window.localStorage.getItem(key)
-    if (!raw) return INITIAL_STATE
-    const parsed: unknown = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return INITIAL_STATE
-    const { _pendingCloudSync: ignored, ...saved } = parsed as Record<string, unknown>
-    void ignored
-    return isValidPetState(saved) ? { ...INITIAL_STATE, ...saved } as PetState : INITIAL_STATE
-  } catch {
-    return INITIAL_STATE
-  }
+  const cached = readLocalPetCache(key)
+  return cached ? { ...INITIAL_STATE, ...cached.state } as PetState : INITIAL_STATE
 }
 
 const FIRST_DIARY_ENTRY = '第一次见面：星团把星星糖吃了一半，另一半紧紧抱在怀里。'
@@ -62,12 +53,42 @@ const loadLocalDiary = (key: string): string[] => {
   }
 }
 
+const writeCloudSnapshot = async (
+  userId: string,
+  state: PetState,
+  baseUpdatedAt: string | null,
+) => {
+  if (!supabase) throw new Error('Supabase client is unavailable')
+  const nextVersion = nextCloudUpdatedAt(baseUpdatedAt)
+  const payload = { user_id: userId, ...state, updated_at: nextVersion }
+
+  if (baseUpdatedAt === null) {
+    const { data, error } = await supabase
+      .from('pet_states')
+      .insert(payload)
+      .select('updated_at')
+      .maybeSingle()
+    return { data, error, nextVersion }
+  }
+
+  const { data, error } = await supabase
+    .from('pet_states')
+    .update(payload)
+    .eq('user_id', userId)
+    .eq('pet_id', state.pet_id)
+    .eq('updated_at', baseUpdatedAt)
+    .select('updated_at')
+    .maybeSingle()
+  return { data, error, nextVersion }
+}
+
 const StarIslandSession = ({ user }: StarIslandPageProps) => {
   const { pet: storageKey, diary: diaryKey } = storageKeysFor(user?.id ?? null)
   const [pet, setPet] = useState<PetState>(INITIAL_STATE)
   const [ready, setReady] = useState(false)
   const [saving, setSaving] = useState(false)
   const [cloudWriteReady, setCloudWriteReady] = useState(!user)
+  const [cloudBaseUpdatedAt, setCloudBaseUpdatedAt] = useState<string | null>(null)
   const [message, setMessage] = useState('星团正蜷在星窝里，等你来找它。')
   const [rename, setRename] = useState(INITIAL_STATE.name)
   const [diary, setDiary] = useState<string[]>(() => loadLocalDiary(diaryKey))
@@ -79,66 +100,96 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
   useEffect(() => {
     let cancelled = false
     const restore = async () => {
+      const localCache = readLocalPetCache(storageKey)
       const restoreLocal = () => {
         const cached = loadLocalState(storageKey)
         setPet(cached)
         setRename(cached.name)
       }
+
       try {
         if (user && supabase) {
-          const pendingSync = hasPendingCloudSync(storageKey)
-          if (pendingSync) {
-            // A pending marker means the local state came from a previously verified cloud session.
-            setCloudWriteReady(canWriteCloud({ authenticated: true, cloudStateKnown: false, pendingSync: true }))
+          if (localCache?.pendingCloudSync) {
             const cached = loadLocalState(storageKey)
-            if (cancelled) return
+            const baseUpdatedAt = localCache.cloudBaseUpdatedAt
             setPet(cached)
             setRename(cached.name)
-            const { error } = await supabase.from('pet_states').upsert({
-              user_id: user.id,
-              ...cached,
-              updated_at: new Date().toISOString(),
-            }, { onConflict: 'user_id,pet_id' })
+
+            if (baseUpdatedAt === undefined) {
+              setCloudWriteReady(false)
+              setMessage('本地待同步进度缺少可信的云端版本基线，已保留在本机并进入只读模式，避免覆盖云端存档。')
+              return
+            }
+
+            setCloudBaseUpdatedAt(baseUpdatedAt)
+            setCloudWriteReady(false)
+            const { data, error, nextVersion } = await writeCloudSnapshot(user.id, cached, baseUpdatedAt)
             if (cancelled) return
             if (error) {
-              setMessage('已找回本地进度，但云端同步仍未成功；请稍后再试。')
+              setCloudWriteReady(false)
+              setMessage('本地待同步进度已保留，但云端同步失败；互动已暂停，刷新后会重新进行版本校验。')
+              console.error('[star-island] pending sync failed', error)
+            } else if (!data) {
+              setCloudWriteReady(false)
+              setMessage('云端存档已在其他设备更新或发生变化。本地进度仍保留，已停止自动覆盖。')
             } else {
-              saveLocalJson(storageKey, cached)
+              setCloudBaseUpdatedAt(nextVersion)
+              setCloudWriteReady(true)
+              saveLocalJson(storageKey, { ...cached, _cloudBaseUpdatedAt: nextVersion })
+              setMessage('本地待同步进度已通过云端版本校验并同步。')
             }
           } else {
             const { data, error } = await supabase
               .from('pet_states')
-              .select('pet_id,name,level,experience,hunger,joy,bond,stardust,star_candy,growth_stage,star_pattern')
+              .select('pet_id,name,level,experience,hunger,joy,bond,stardust,star_candy,growth_stage,star_pattern,updated_at')
               .eq('user_id', user.id)
               .eq('pet_id', INITIAL_STATE.pet_id)
               .maybeSingle()
             if (cancelled) return
             if (error) {
               restoreLocal()
+              setCloudWriteReady(false)
               setMessage('云端读取失败，已显示本地缓存；为避免覆盖云端进度，当前暂为只读模式。恢复连接后请刷新。')
-            } else {
-              setCloudWriteReady(canWriteCloud({ authenticated: true, cloudStateKnown: true, pendingSync: false }))
-              if (data) {
-                const restored = { ...INITIAL_STATE, ...data } as PetState
-                setPet(restored)
-                setRename(restored.name)
-                saveLocalJson(storageKey, restored)
+            } else if (data) {
+              const { updated_at: baseUpdatedAt, ...cloudState } = data
+              const restored = { ...INITIAL_STATE, ...cloudState } as PetState
+              setPet(restored)
+              setRename(restored.name)
+              setCloudBaseUpdatedAt(baseUpdatedAt)
+              setCloudWriteReady(true)
+              saveLocalJson(storageKey, { ...restored, _cloudBaseUpdatedAt: baseUpdatedAt })
+            } else if (localCache) {
+              const cached = loadLocalState(storageKey)
+              setPet(cached)
+              setRename(cached.name)
+              if (localCache.cloudBaseUpdatedAt === null) {
+                setCloudBaseUpdatedAt(null)
+                setCloudWriteReady(true)
+                saveLocalJson(storageKey, { ...cached, _cloudBaseUpdatedAt: null })
               } else {
-                restoreLocal()
+                setCloudWriteReady(false)
+                setMessage('云端目前没有存档，但本地缓存缺少“云端为空”的可信基线。已保留本地数据并进入只读模式。')
               }
+            } else {
+              setPet(INITIAL_STATE)
+              setRename(INITIAL_STATE.name)
+              setCloudBaseUpdatedAt(null)
+              setCloudWriteReady(true)
+              saveLocalJson(storageKey, { ...INITIAL_STATE, _cloudBaseUpdatedAt: null })
             }
           }
         } else {
-          if (cancelled) return
           restoreLocal()
+          setCloudWriteReady(!user)
           if (user) setMessage('云端存档服务未连接；已显示本地缓存，当前暂为只读模式。')
         }
       } catch (error) {
         if (!cancelled) {
           restoreLocal()
-          setMessage(user && !hasPendingCloudSync(storageKey)
-            ? '云端状态无法确认，已显示本地缓存；当前暂为只读模式。恢复连接后请刷新。'
-            : '云端暂不可用，已找回待同步的本地进度。')
+          if (user) setCloudWriteReady(false)
+          setMessage(user
+            ? '云端状态无法确认，已保留本地缓存并进入只读模式。恢复连接后刷新可重新校验。'
+            : '本地存档暂时无法读取。')
           console.error('[star-island] restore failed', error)
         }
       } finally {
@@ -151,37 +202,44 @@ const StarIslandSession = ({ user }: StarIslandPageProps) => {
 
   const persist = useCallback(async (next: PetState) => {
     if (user && !cloudWriteReady) {
-      setMessage('云端状态尚未确认，已暂时锁定互动，避免覆盖已有存档。恢复连接后刷新页面即可重试。')
+      setMessage('云端状态尚未确认或存在版本冲突，已暂停互动，避免覆盖已有存档。')
       return
     }
-    // Store the pending marker atomically with the pet state. A failed cloud
-    // write must not let a stale cloud snapshot replace newer local progress.
-    const localSaved = saveLocalJson(storageKey, user ? { ...next, _pendingCloudSync: true } : next)
+    const localSaved = saveLocalJson(storageKey, user
+      ? { ...next, _pendingCloudSync: true, _cloudBaseUpdatedAt: cloudBaseUpdatedAt }
+      : next)
     if (!user || !supabase) {
       setMessage(localSaved ? '已保存在这台设备上；登录并配置云端存档后即可跨设备继续。' : '当前浏览器无法保存本地存档，请检查存储权限。')
       return
     }
     setSaving(true)
     try {
-      const { error } = await supabase.from('pet_states').upsert({
-        user_id: user.id,
-        ...next,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id,pet_id' })
+      const { data, error, nextVersion } = await writeCloudSnapshot(user.id, next, cloudBaseUpdatedAt)
       if (error) {
-        setMessage(localSaved ? '本地已保存，但云端存档未成功写入。请稍后重试。' : '本地与云端存档均未成功，请检查存储权限或稍后重试。')
+        setCloudWriteReady(false)
+        setMessage(localSaved
+          ? '本地待同步进度已保留，但云端写入失败；互动已暂停，刷新后会重新进行版本校验。'
+          : '本地与云端存档均未确认成功；互动已暂停，请检查存储权限或稍后刷新。')
         console.error('[star-island] save failed', error)
+      } else if (!data) {
+        setCloudWriteReady(false)
+        setMessage('云端存档版本已变化。本地进度仍保留，已停止自动覆盖，请先处理版本冲突。')
       } else {
-        if (localSaved) saveLocalJson(storageKey, next)
-        setMessage('星团的成长已经保存到云端。')
+        setCloudBaseUpdatedAt(nextVersion)
+        setCloudWriteReady(true)
+        if (localSaved) saveLocalJson(storageKey, { ...next, _cloudBaseUpdatedAt: nextVersion })
+        setMessage('星团的成长已经通过版本校验保存到云端。')
       }
     } catch (error) {
-      setMessage(localSaved ? '本地已保存，但云端暂不可用；下次进入会重试同步。' : '本地与云端均未保存成功，请稍后重试。')
+      setCloudWriteReady(false)
+      setMessage(localSaved
+        ? '本地待同步进度已保留，但云端状态无法确认；互动已暂停，刷新后会重新进行版本校验。'
+        : '本地与云端均未确认保存成功，请稍后刷新。')
       console.error('[star-island] save failed', error)
     } finally {
       setSaving(false)
     }
-  }, [user, storageKey, cloudWriteReady])
+  }, [user, storageKey, cloudWriteReady, cloudBaseUpdatedAt])
 
   const act = useCallback((kind: 'feed' | 'pet' | 'play' | 'stay') => {
     let next: PetState
