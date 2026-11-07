@@ -22,7 +22,7 @@ create or replace function public.set_pet_states_updated_at()
 returns trigger
 language plpgsql
 set search_path = pg_catalog
-as $
+as $function$
 begin
   if tg_op = 'INSERT' then
     new.updated_at := clock_timestamp();
@@ -31,7 +31,7 @@ begin
   end if;
   return new;
 end;
-$;
+$function$;
 
 drop trigger if exists pet_states_updated_at on public.pet_states;
 create trigger pet_states_updated_at
