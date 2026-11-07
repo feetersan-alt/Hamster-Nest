@@ -59,6 +59,7 @@ import ExportPage from './pages/ExportPage'
 import RpRoomsPage from './pages/RpRoomsPage'
 import RpRoomPage from './pages/RpRoomPage'
 import HomePage from './pages/HomePage'
+import StarIslandPage from './pages/StarIslandPage'
 import OverviewPage from './pages/OverviewPage'
 import MemoryRelayPage from './pages/MemoryRelayPage'
 import HomeLayoutSettingsPage from './pages/HomeLayoutSettingsPage'
@@ -1991,6 +1992,7 @@ const App = () => {
       style={{ '--app-background-image': appBackgroundImage ? `url(${appBackgroundImage})` : 'none' } as CSSProperties}
     >
       <Routes>
+        <Route path="/star-island" element={<RequireAuth ready={authReady} user={user}><StarIslandPage user={user} /></RequireAuth>} />
         <Route path="/auth" element={<AuthPage user={user} />} />
         <Route
           path="/conversation-canary"
