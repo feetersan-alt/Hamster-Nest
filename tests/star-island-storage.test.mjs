@@ -8,7 +8,7 @@ const pageSource = readFileSync(new URL('../src/pages/StarIslandPage.tsx', impor
 const compiled = ts.transpileModule(helperSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText
-const { storageKeysFor, saveLocalJson, hasPendingCloudSync, isValidPetState, canWriteCloud } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
+const { storageKeysFor, saveLocalJson, hasPendingCloudSync, readLocalPetCache, nextCloudUpdatedAt, isValidPetState, canWriteCloud } = await import(`data:text/javascript,${encodeURIComponent(compiled)}`)
 
 test('pet and diary cache keys are distinct for different accounts and guests', () => {
   const a = storageKeysFor('account-a')
@@ -43,7 +43,7 @@ test('blocked storage does not interrupt cloud persistence', () => {
   assert.equal(saveLocalJson('pet', { level: 2 }, denied), false)
   assert.equal(saveLocalJson('pet', { level: 2 }, () => ({ setItem: denied })), false)
   assert.match(pageSource, /_pendingCloudSync: true/)
-  assert.match(pageSource, /hasPendingCloudSync\(storageKey\)/)
+  assert.match(pageSource, /readLocalPetCache\(storageKey\)/)
   assert.match(pageSource, /if \(localSaved\) saveLocalJson\(storageKey, next\)/)
 })
 
@@ -100,15 +100,56 @@ test('invalid local cache is rejected instead of displayed or synced over valid 
   assert.match(pageSource, /isValidPetState\(saved\) \?/)
 })
 
-test('restore preserves pending local state and retries cloud upsert', () => {
-  assert.match(pageSource, /const pendingSync = hasPendingCloudSync\(storageKey\);?\s*if \(pendingSync\)/)
-  assert.match(pageSource, /const cached = loadLocalState\(storageKey\)/)
-  assert.match(pageSource, /updated_at: new Date\(\)\.toISOString\(\)/)
-  assert.match(pageSource, /const \{ _pendingCloudSync: ignored, \.\.\.saved \}/)
-  assert.match(pageSource, /finally \{\s*if \(!cancelled\) setReady\(true\)/)
-  assert.match(pageSource, /finally \{\s*setSaving\(false\)/)
+test('pending cache retains its cloud-version baseline without mixing metadata into pet state', () => {
+  const key = storageKeysFor('account-a').pet
+  const state = { pet_id: 'xing-tuan', name: '星团', level: 4, experience: 8, hunger: 72, joy: 72, bond: 10, stardust: 3, star_candy: 3, growth_stage: '成长期', star_pattern: '第一道微光星纹' }
+  const store = new Map()
+  const storage = {
+    setItem: (k, v) => store.set(k, v),
+    getItem: k => store.get(k) ?? null,
+  }
+  const baseline = '2026-11-06T12:00:00.000Z'
+  assert.equal(saveLocalJson(key, { ...state, _pendingCloudSync: true, _cloudBaseUpdatedAt: baseline }, () => storage), true)
+  const cached = readLocalPetCache(key, () => storage)
+  assert.equal(cached?.pendingCloudSync, true)
+  assert.equal(cached?.cloudBaseUpdatedAt, baseline)
+  assert.deepEqual(cached?.state, state)
+
+  assert.equal(saveLocalJson(key, { ...state, _pendingCloudSync: true, _cloudBaseUpdatedAt: null }, () => storage), true)
+  assert.equal(readLocalPetCache(key, () => storage)?.cloudBaseUpdatedAt, null)
 })
 
+test('legacy pending cache without a valid cloud baseline is retained but cannot be auto-synced safely', () => {
+  const key = 'pet'
+  const state = { pet_id: 'xing-tuan', name: '星团', level: 4, experience: 8, hunger: 72, joy: 72, bond: 10, stardust: 3, star_candy: 3, growth_stage: '成长期', star_pattern: '第一道微光星纹' }
+  const read = value => () => ({ getItem: () => JSON.stringify(value) })
+  const legacy = readLocalPetCache(key, read({ ...state, _pendingCloudSync: true }))
+  assert.equal(legacy?.pendingCloudSync, true)
+  assert.equal(legacy?.cloudBaseUpdatedAt, undefined)
+  const malformed = readLocalPetCache(key, read({ ...state, _pendingCloudSync: true, _cloudBaseUpdatedAt: 'not-a-date' }))
+  assert.equal(malformed?.pendingCloudSync, true)
+  assert.equal(malformed?.cloudBaseUpdatedAt, undefined)
+})
+
+test('next cloud version is strictly newer than its baseline even when the local clock has not advanced', () => {
+  const baseline = '2026-11-06T12:00:00.123Z'
+  const next = nextCloudUpdatedAt(baseline, Date.parse(baseline))
+  assert.equal(next, '2026-11-06T12:00:00.124Z')
+  assert.ok(Date.parse(next) > Date.parse(baseline))
+  assert.ok(Date.parse(nextCloudUpdatedAt(null, 1000)) >= 1000)
+})
+
+test('pending restore and cloud writes use compare-and-swap rather than blind upsert', () => {
+  assert.match(pageSource, /const localCache = readLocalPetCache\(storageKey\)/)
+  assert.match(pageSource, /const baseUpdatedAt = localCache\.cloudBaseUpdatedAt/)
+  assert.match(pageSource, /if \(baseUpdatedAt === undefined\)/)
+  assert.match(pageSource, /\.eq\('updated_at', baseUpdatedAt\)/)
+  assert.match(pageSource, /\.insert\(payload\)/)
+  assert.match(pageSource, /\.update\(payload\)/)
+  assert.match(pageSource, /updated_at: nextVersion/)
+  assert.match(pageSource, /else if \(!data\)/)
+  assert.doesNotMatch(pageSource, /\.upsert\(/)
+})
 
 test('pet_states migration grants browser access under RLS', () => {
   const migration = readFileSync(new URL('../supabase/migrations/20261018000000_create_pet_states.sql', import.meta.url), 'utf8')
