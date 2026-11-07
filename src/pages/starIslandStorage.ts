@@ -65,21 +65,33 @@ export const readLocalPetCache = (
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null
 
     const record = parsed as Record<string, unknown>
-    const { _pendingCloudSync, _cloudBaseUpdatedAt, ...state } = record
+    const state: Record<string, unknown> = {
+      pet_id: record.pet_id,
+      name: record.name,
+      level: record.level,
+      experience: record.experience,
+      hunger: record.hunger,
+      joy: record.joy,
+      bond: record.bond,
+      stardust: record.stardust,
+      star_candy: record.star_candy,
+      growth_stage: record.growth_stage,
+      star_pattern: record.star_pattern,
+    }
     if (!isValidPetState(state)) return null
 
     const hasBaseline = Object.prototype.hasOwnProperty.call(record, '_cloudBaseUpdatedAt')
     const cloudBaseUpdatedAt = !hasBaseline
       ? undefined
-      : _cloudBaseUpdatedAt === null
+      : record._cloudBaseUpdatedAt === null
         ? null
-        : isValidCloudBaseUpdatedAt(_cloudBaseUpdatedAt)
-          ? _cloudBaseUpdatedAt
+        : isValidCloudBaseUpdatedAt(record._cloudBaseUpdatedAt)
+          ? record._cloudBaseUpdatedAt
           : undefined
 
     return {
       state,
-      pendingCloudSync: _pendingCloudSync === true,
+      pendingCloudSync: record._pendingCloudSync === true,
       cloudBaseUpdatedAt,
     }
   } catch {
